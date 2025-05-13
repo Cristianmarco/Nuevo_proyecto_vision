@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Proyecto Visión</title>
+  <link rel="stylesheet" href="/css/login.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+</head>
+
+<body class="login-page">
+  <div class="login-container">
+    <h1>Iniciar Sesión</h1>
+    <form action="/main" method="get" onsubmit="return validateForm()">
+      <label for="username">Usuario</label>
+      <input type="text" id="username" name="username" placeholder="Ingrese su usuario" required />
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" name="password" placeholder="Ingrese su contraseña" required />
+
+      <button type="submit">Ingresar</button>
+    </form>
+    <div class="extra-links">
+      <a href="#">¿Olvidaste tu contraseña?</a> |
+      <a href="#">Crear cuenta</a>
+    </div>
+    <img src="/logo.png" alt="Logo Empresa" class="login-logo" />
+  </div>
+
+  <script>
+    function validateForm() {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      if (!user || !pass) {
+        alert('Por favor, complete todos los campos.');
+        return false;
+      }
+      return true;
+    }
+  </script>
+  <script src="/scripts/sidebar.js"></script>
+  <script src="/scripts/logout.js"></script>
+  <script src="/scripts/abm_clientes.js"></script>
+  <script src="/scripts/dashboard.js"></script>
+
+</body>
+
+</html>

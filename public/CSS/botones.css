@@ -1,0 +1,83 @@
+/* ======= [BOTONES CSS CARGADO] ======= */
+
+.logout-button {
+  padding: 8px 16px;
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
+}
+
+.acciones-clientes {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-start;
+}
+
+.icon-button {
+  background-color: #ccc;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon-button:hover {
+  transform: scale(1.2);
+  opacity: 0.9;
+}
+
+.icon-button.visualizar { background-color: #5bc0de; }
+.icon-button.agregar    { background-color: #5cb85c; }
+.icon-button.modificar  { background-color: #f0ad4e; }
+.icon-button.eliminar   { background-color: #d9534f; }
+
+.btn-guardar {
+  background-color: #00cc66;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.btn-guardar:hover {
+  background-color: #00a653;
+}
+
+.btn-terminado {
+  padding: 6px 12px;
+  background-color: #4a6c78;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-terminado:hover {
+  background-color: #3d5a63;
+  transform: scale(1.05);
+}
+
+.btn-terminado:active {
+  background-color: #344c53;
+}

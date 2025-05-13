@@ -1,0 +1,44 @@
+[
+  {
+    "fechaIngreso": "2025-04-05",
+    "codigo": "3086502",
+    "tipo": "Alternador",
+    "modelo": "Bosch Electronico 24/80",
+    "cliente": "Bluecar",
+    "tecnico": "Kity",
+    "id": "416",
+    "estado": "Salida"
+  },
+  {
+    "fechaIngreso": "2025-04-01",
+    "codigo": "1054948",
+    "tipo": "Arranque",
+    "modelo": "29MT 24V",
+    "cliente": "Fantasia SA",
+    "id": "",
+    "estado": "Esperando Repuesto",
+    "fechaEntrega": "2025-05-08"
+  },
+  {
+    "fechaIngreso": "2025-05-07",
+    "codigo": "006",
+    "tipo": "Alternador",
+    "modelo": "Scania 24V",
+    "cliente": "Fantasia",
+    "tecnico": "Beto",
+    "id": "295",
+    "estado": "Salida",
+    "fechaEntrega": "2025-05-08"
+  },
+  {
+    "fechaIngreso": "2025-05-05",
+    "codigo": "8076868",
+    "tipo": "Alternador",
+    "modelo": "Alt. Scania 12V",
+    "cliente": "Bluecar",
+    "tecnico": "kity",
+    "id": "2957",
+    "estado": "Ingreso",
+    "fechaEntrega": "2025-05-12"
+  }
+]

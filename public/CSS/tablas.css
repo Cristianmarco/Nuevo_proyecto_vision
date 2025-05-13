@@ -1,0 +1,110 @@
+/* ======= [TABLAS CSS CARGADO] ======= */
+
+.tabla-clientes {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.tabla-clientes thead {
+  background-color: #00FF00;
+  color: #ffffff;
+}
+
+.tabla-clientes th,
+.tabla-clientes td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #dddddd;
+  width: 11.11%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabla-clientes tbody tr:hover {
+  background-color: #f2f2f2;
+}
+
+.tabla-clientes tr.seleccionado {
+  background-color: #d1ffd1;
+}
+
+#entregadas-panel h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #000;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+#entregadas-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#entregadas-panel th,
+#entregadas-panel td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+#entregadas-panel tr:hover {
+  background-color: #f5f5f5;
+}
+
+#entregadas-panel td:nth-child(1) {
+  font-weight: bold;
+  color: #333;
+}
+
+/* ======= [ESTILO TABLA ABM CLIENTES] ======= */
+
+.tabla-clientes {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.tabla-clientes thead {
+  background-color: #4da6ff; /* Azulino moderno */
+  color: #fff;
+}
+
+.tabla-clientes th,
+.tabla-clientes td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabla-clientes tbody tr:hover {
+  background-color: #f5faff;
+}
+
+.tabla-clientes tr.seleccionado {
+  background-color: #d1ffd1; /* Verde claro para fila seleccionada */
+}
+
+.tabla-clientes th:first-child,
+.tabla-clientes td:first-child {
+  border-left: none;
+}
+
+.tabla-clientes th:last-child,
+.tabla-clientes td:last-child {
+  border-right: none;
+}

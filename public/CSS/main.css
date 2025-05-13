@@ -1,0 +1,10 @@
+/* ======= [MAIN CSS CARGADO] ======= */
+/* Centraliza la carga de todos los estilos CSS del proyecto */
+
+@import url('/css/layout.css');
+@import url('/css/tablas.css');
+@import url('/css/modales.css');
+@import url('/css/botones.css');
+@import url('/css/animaciones.css');
+@import url('/css/dashboard.css');
+

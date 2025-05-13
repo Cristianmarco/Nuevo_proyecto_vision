@@ -1,0 +1,18 @@
+{
+  "name": "nuevo_proyecto_vision",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de reparaciones y clientes.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "Tu Nombre o Empresa",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

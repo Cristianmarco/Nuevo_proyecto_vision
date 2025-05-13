@@ -1,0 +1,88 @@
+/* ===== Modal General ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-contenido {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.cerrar {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+}
+
+.cerrar:hover {
+  color: #ff4444;
+}
+
+.modal.mostrar {
+  display: flex !important;
+}
+
+/* ===== Formularios de Modales ===== */
+#form-agregar input,
+#form-modificar input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#form-agregar .btn-guardar,
+#form-modificar .btn-guardar {
+  background-color: #00cc66;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+
+#form-agregar .btn-guardar:hover,
+#form-modificar .btn-guardar:hover {
+  background-color: #00a653;
+}
+
+.datos-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.datos-cliente p {
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
