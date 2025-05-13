@@ -53,107 +53,66 @@
 
   <!-- CONTENT -->
   <main class="content">
-    <h1>ABM de Clientes</h1>
-
-    <!-- Tabla de Clientes -->
-    <section class="table-section">
-      <table class="tabla-clientes">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Razón Social</th>
-            <th>Nombre de Fantasía</th>
-            <th>Domicilio</th>
-            <th>Localidad</th>
-            <th>Provincia</th>
-            <th>Teléfono</th>
-            <th>Mail</th>
-            <th>DNI/CUIT</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Datos de clientes van aquí -->
-        </tbody>
-      </table>
-    </section>
-
-    <!-- Iconos de Acciones -->
-    <section class="acciones-clientes">
-      <button class="icon-button visualizar" onclick="visualizarCliente()">
-        <i class="fas fa-eye"></i>
-      </button>
-      <button class="icon-button agregar" onclick="abrirModal()">
-        <i class="fas fa-plus"></i>
-      </button>
-      <button class="icon-button modificar" onclick="abrirModalModificar()">
-        <i class="fas fa-edit"></i>
-      </button>
-
-      <button class="icon-button eliminar" onclick="eliminarCliente()">
-        <i class="fas fa-trash"></i>
-      </button>
-
-    </section>
-  </main>
-
-  <!-- Modal Agregar Cliente -->
-  <div id="modal-agregar" class="modal">
-    <div class="modal-contenido">
-      <span class="cerrar" onclick="cerrarModal()">&times;</span>
-      <h2>Agregar Cliente</h2>
-      <form id="form-agregar">
-        <input type="text" name="codigo" placeholder="Código" required />
-        <input type="text" name="razonSocial" placeholder="Razón Social" required />
-        <input type="text" name="fantasia" placeholder="Nombre de Fantasía" />
-        <input type="text" name="domicilio" placeholder="Domicilio" />
-        <input type="text" name="localidad" placeholder="Localidad" />
-        <input type="text" name="provincia" placeholder="Provincia" />
-        <input type="text" name="telefono" placeholder="Teléfono" />
-        <input type="email" name="mail" placeholder="Mail" />
-        <input type="text" name="documento" placeholder="DNI/CUIT" />
-        <button type="submit" class="btn-guardar">Guardar</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Modificar Cliente -->
-  <div id="modal-modificar" class="modal">
-    <div class="modal-contenido">
-      <span class="cerrar" onclick="cerrarModalModificar()">&times;</span>
-      <h2>Modificar Cliente</h2>
-      <form id="form-modificar">
-        <input type="text" name="codigo" placeholder="Código" readonly />
-        <input type="text" name="razonSocial" placeholder="Razón Social" required />
-        <input type="text" name="fantasia" placeholder="Nombre de Fantasía" />
-        <input type="text" name="domicilio" placeholder="Domicilio" />
-        <input type="text" name="localidad" placeholder="Localidad" />
-        <input type="text" name="provincia" placeholder="Provincia" />
-        <input type="text" name="telefono" placeholder="Teléfono" />
-        <input type="email" name="mail" placeholder="Mail" />
-        <input type="text" name="documento" placeholder="DNI/CUIT" />
-        <button type="submit" class="btn-guardar">Guardar Cambios</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Visualizar Cliente -->
-  <div id="modal-visualizar" class="modal">
-    <div class="modal-contenido">
-      <span class="cerrar" onclick="cerrarModalVisualizar()">&times;</span>
-      <h2>Detalles del Cliente</h2>
-      <div id="datos-cliente" class="datos-cliente">
-        <!-- Los datos se inyectan aquí por JS -->
+  <!-- Fichas Principales -->
+  <section id="seccion-principal" style="display: flex;">
+    <div class="dashboard-cards">
+      <div class="card" onclick="irAClientes()">
+        <div class="card-icon"><i class="fas fa-users"></i></div>
+        <div class="card-info">
+          <h3>Clientes</h3>
+          <p>Gestión completa de clientes</p>
+        </div>
       </div>
-      <button class="btn-guardar" onclick="cerrarModalVisualizar()">Cerrar</button>
+
+      <div class="card" onclick="mostrarSubmenuReparaciones()">
+        <div class="card-icon"><i class="fas fa-tools"></i></div>
+        <div class="card-info">
+          <h3>Reparaciones</h3>
+          <p>Vigentes y Entregadas</p>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- Submenú Reparaciones -->
+  <section id="submenu-reparaciones" class="submenu-reparaciones" style="display: none;">
+    <div class="small-card" onclick="window.location.href='/reparaciones-vigentes'">
+      <i class="fas fa-wrench"></i>
+      <span>Vigentes</span>
+    </div>
+    <div class="small-card" onclick="window.location.href='/reparaciones-entregadas'">
+      <i class="fas fa-box"></i>
+      <span>Entregadas</span>
+    </div>
+    <button class="btn-volver" onclick="volverASeccionPrincipal()">Volver</button>
+  </section>
+</main>
 
 
+  <!-- Iconos de Acciones -->
+  <section class="acciones-clientes">
+    <button class="icon-button visualizar" onclick="visualizarCliente()">
+      <i class="fas fa-eye"></i>
+    </button>
+    <button class="icon-button agregar" onclick="abrirModal()">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="icon-button modificar" onclick="abrirModalModificar()">
+      <i class="fas fa-edit"></i>
+    </button>
 
+    <button class="icon-button eliminar" onclick="eliminarCliente()">
+      <i class="fas fa-trash"></i>
+    </button>
+
+  </section>
+</main>
   <script src="/scripts/logout.js"></script>
   <script src="/scripts/abm_clientes.js"></script>
   <script src="/scripts/dashboard.js"></script>
   <script src="/scripts/sidebar.js"></script>
+  <script src="/scripts/externos.js"></script>
+
   <script>
     function logout() {
       if (confirm('¿Seguro que deseas salir?')) {

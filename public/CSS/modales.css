@@ -12,13 +12,18 @@
   align-items: center;
 }
 
+.modal.mostrar {
+  display: flex;
+}
+
 .modal-contenido {
-  background-color: #fff;
-  padding: 30px;
+  background-color: #ffffff;
+  padding: 30px 40px;
   border-radius: 12px;
+  max-width: 600px;
   width: 100%;
-  max-width: 500px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  text-align: left;
   position: relative;
 }
 
@@ -34,10 +39,6 @@
 
 .cerrar:hover {
   color: #ff4444;
-}
-
-.modal.mostrar {
-  display: flex !important;
 }
 
 /* ===== Formularios de Modales ===== */

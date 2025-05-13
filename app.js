@@ -163,3 +163,21 @@ app.post('/api/entregadas', (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });
+
+app.get('/externos', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'views', 'externos.html'));
+});
+
+app.get('/externos-clientes', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'views', 'externos_clientes.html'));
+});
+
+
+app.get('/reparaciones-vigentes', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_vigentes.html'));
+});
+
+app.get('/reparaciones-entregadas', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_entregadas.html'));
+});
+
