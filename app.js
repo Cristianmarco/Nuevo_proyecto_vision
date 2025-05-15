@@ -10,6 +10,15 @@ const clientesPath = path.join(__dirname, 'clientes.json');
 // Crear archivo si no existe
 if (!fs.existsSync(clientesPath)) fs.writeFileSync(clientesPath, '[]', 'utf-8');
 
+const entregadasPath = path.join(__dirname, 'entregadas.json');
+
+// Crear archivo entregadas.json si no existe
+if (!fs.existsSync(entregadasPath)) {
+    fs.writeFileSync(entregadasPath, '[]', 'utf-8');
+}
+
+const stockPath = path.join(__dirname, 'stock.json');
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -188,4 +197,76 @@ app.get('/reparaciones-vigentes', (req, res) => {
 app.get('/reparaciones-entregadas', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_entregadas.html'));
 });
+
+
+
+// API Reparaciones Vigentes
+
+const reparacionesPath = path.join(__dirname, 'reparaciones.json');
+if (!fs.existsSync(reparacionesPath)) fs.writeFileSync(reparacionesPath, '[]', 'utf-8');
+
+app.get('/api/reparaciones', (req, res) => {
+    fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
+        if (err) return res.status(500).json({ error: 'Error al leer reparaciones' });
+        res.json(JSON.parse(data || '[]'));
+    });
+});
+
+app.post('/api/reparaciones', (req, res) => {
+    const nueva = req.body;
+    fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
+        let arr = [];
+        if (!err && data) arr = JSON.parse(data);
+        arr.push(nueva);
+        fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
+            if (err) return res.status(500).json({ error: 'Error al guardar reparación' });
+            res.status(201).json({ mensaje: 'Reparación agregada' });
+        });
+    });
+});
+
+
+// ✏️ PUT - Modificar Reparación por Código
+app.put('/api/reparaciones/:codigo', (req, res) => {
+    const codigo = req.params.codigo;
+    const actualizado = req.body;
+
+    fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
+        let arr = JSON.parse(data || '[]');
+        const idx = arr.findIndex(r => r.codigo === codigo);
+
+        if (idx === -1) return res.status(404).json({ error: 'Reparación no encontrada' });
+
+        arr[idx] = actualizado;
+
+        fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
+            if (err) return res.status(500).json({ error: 'Error al modificar reparación' });
+            res.json({ mensaje: 'Reparación modificada' });
+        });
+    });
+});
+
+// ✅ DELETE - Eliminar Reparación Vigente por Código (Desde Stock)
+app.delete('/api/reparaciones/:codigo', (req, res) => {
+    const codigo = req.params.codigo;
+
+    fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
+        if (err) return res.status(500).json({ error: 'Error al leer reparaciones' });
+
+        let reparaciones = JSON.parse(data || '[]');
+        const filtrado = reparaciones.filter(r => r.codigo !== codigo);
+
+        if (filtrado.length === reparaciones.length) {
+            return res.status(404).json({ error: 'Reparación no encontrada' });
+        }
+
+        fs.writeFile(reparacionesPath, JSON.stringify(filtrado, null, 2), err => {
+            if (err) return res.status(500).json({ error: 'Error al eliminar reparación' });
+            res.json({ mensaje: 'Reparación eliminada' });
+        });
+    });
+});
+
+
+
 

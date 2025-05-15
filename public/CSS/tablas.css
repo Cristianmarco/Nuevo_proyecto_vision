@@ -108,3 +108,81 @@
 .tabla-clientes td:last-child {
   border-right: none;
 }
+
+/* ======= Estilo Tabla de Reparaciones ======= */
+.tabla-reparaciones {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.tabla-reparaciones thead {
+    background-color: #007BFF;
+    color: #ffffff;
+}
+
+.tabla-reparaciones th, 
+.tabla-reparaciones td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+.tabla-reparaciones tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.tabla-reparaciones tr.seleccionado {
+    background-color: #d1ffd1;
+}
+
+/* ======= Botones de Acciones ======= */
+.acciones-reparaciones {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.icon-button {
+    background-color: #ccc;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.icon-button:hover {
+    transform: scale(1.2);
+    opacity: 0.9;
+}
+
+.icon-button.visualizar { background-color: #5bc0de; }
+.icon-button.agregar    { background-color: #5cb85c; }
+.icon-button.modificar  { background-color: #f0ad4e; }
+.icon-button.eliminar   { background-color: #d9534f; }
+
+.btn-terminado {
+    padding: 5px 10px;
+    background-color: #4a6c78;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-terminado:hover {
+    background-color: #3d5a63;
+    transform: scale(1.05);
+}
