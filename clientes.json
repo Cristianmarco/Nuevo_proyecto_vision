@@ -1,2 +1,13 @@
 [
+  {
+    "codigo": "C999",
+    "razonSocial": "Empresa Test",
+    "fantasia": "Fantasia Test",
+    "domicilio": "Calle Falsa 123",
+    "localidad": "Ciudad Test",
+    "provincia": "Provincia Test",
+    "telefono": "555123456",
+    "mail": "test@mail.com",
+    "documento": "30-99999999-9"
+  }
 ]
