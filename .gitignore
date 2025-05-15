@@ -32,3 +32,6 @@ test-results/
 
 # Others
 public/uploads/
+
+# Data files
+*.json
