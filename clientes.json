@@ -9,5 +9,27 @@
     "telefono": "555123456",
     "mail": "test@mail.com",
     "documento": "30-99999999-9"
+  },
+  {
+    "codigo": "B001",
+    "razonSocial": "Blucar SA",
+    "fantasia": "Bluecar",
+    "domicilio": "California 2067 (CP 1289)",
+    "localidad": "Barracas",
+    "provincia": "Ciudad Autónoma de Buenos Aires",
+    "telefono": "44417776",
+    "mail": "info@bluecar.com.ar",
+    "documento": "30-70792490-6"
+  },
+  {
+    "codigo": "B002",
+    "razonSocial": "Cristian srl",
+    "fantasia": "Cristian",
+    "domicilio": "Tandil 5157",
+    "localidad": "Ciudad Autonoma de Buenos Aires",
+    "provincia": "Buenos Aires",
+    "telefono": "01159366879",
+    "mail": "cristian.marcolongo@gmail.com",
+    "documento": "22431924"
   }
 ]

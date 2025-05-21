@@ -191,20 +191,20 @@ app.get('/externos-clientes', (req, res) => {
 
 
 app.get('/reparaciones-vigentes', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_vigentes.html'));
+    res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_vigentes.html'));
 });
 
 app.get('/reparaciones-entregadas', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_entregadas.html'));
+    res.sendFile(path.join(__dirname, 'public', 'views', 'reparaciones_entregadas.html'));
 });
 
 
 
-// API Reparaciones Vigentes
 
 const reparacionesPath = path.join(__dirname, 'reparaciones.json');
 if (!fs.existsSync(reparacionesPath)) fs.writeFileSync(reparacionesPath, '[]', 'utf-8');
 
+// GET - Obtener todas las reparaciones
 app.get('/api/reparaciones', (req, res) => {
     fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
         if (err) return res.status(500).json({ error: 'Error al leer reparaciones' });
@@ -212,57 +212,78 @@ app.get('/api/reparaciones', (req, res) => {
     });
 });
 
+// POST - Agregar nueva reparación
 app.post('/api/reparaciones', (req, res) => {
     const nueva = req.body;
+    if (!nueva.codigo) return res.status(400).json({ error: 'El campo "codigo" es obligatorio.' });
+
     fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-        let arr = [];
-        if (!err && data) arr = JSON.parse(data);
+        const arr = JSON.parse(data || '[]');
+        if (arr.some(r => r.codigo === nueva.codigo)) 
+            return res.status(400).json({ error: 'Código de reparación ya existente.' });
+
+        nueva.historial = nueva.historial || ""; // Inicializar historial si no existe
         arr.push(nueva);
+
         fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
-            if (err) return res.status(500).json({ error: 'Error al guardar reparación' });
-            res.status(201).json({ mensaje: 'Reparación agregada' });
+            if (err) return res.status(500).json({ error: 'Error al guardar reparación.' });
+            res.status(201).json({ mensaje: 'Reparación agregada.' });
         });
     });
 });
 
-
-// ✏️ PUT - Modificar Reparación por Código
+// PUT - Modificar reparación
 app.put('/api/reparaciones/:codigo', (req, res) => {
     const codigo = req.params.codigo;
     const actualizado = req.body;
 
     fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-        let arr = JSON.parse(data || '[]');
+        const arr = JSON.parse(data || '[]');
         const idx = arr.findIndex(r => r.codigo === codigo);
+        if (idx === -1) return res.status(404).json({ error: 'Reparación no encontrada.' });
 
-        if (idx === -1) return res.status(404).json({ error: 'Reparación no encontrada' });
-
-        arr[idx] = actualizado;
+        arr[idx] = { ...arr[idx], ...actualizado }; // Mantener historial existente si no se envía
 
         fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
-            if (err) return res.status(500).json({ error: 'Error al modificar reparación' });
-            res.json({ mensaje: 'Reparación modificada' });
+            if (err) return res.status(500).json({ error: 'Error al modificar reparación.' });
+            res.json({ mensaje: 'Reparación modificada.' });
         });
     });
 });
 
-// ✅ DELETE - Eliminar Reparación Vigente por Código (Desde Stock)
+// DELETE - Eliminar reparación
 app.delete('/api/reparaciones/:codigo', (req, res) => {
     const codigo = req.params.codigo;
 
     fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-        if (err) return res.status(500).json({ error: 'Error al leer reparaciones' });
+        const arr = JSON.parse(data || '[]');
+        const filtrado = arr.filter(r => r.codigo !== codigo);
 
-        let reparaciones = JSON.parse(data || '[]');
-        const filtrado = reparaciones.filter(r => r.codigo !== codigo);
-
-        if (filtrado.length === reparaciones.length) {
-            return res.status(404).json({ error: 'Reparación no encontrada' });
-        }
+        if (filtrado.length === arr.length) 
+            return res.status(404).json({ error: 'Reparación no encontrada.' });
 
         fs.writeFile(reparacionesPath, JSON.stringify(filtrado, null, 2), err => {
-            if (err) return res.status(500).json({ error: 'Error al eliminar reparación' });
-            res.json({ mensaje: 'Reparación eliminada' });
+            if (err) return res.status(500).json({ error: 'Error al eliminar reparación.' });
+            res.json({ mensaje: 'Reparación eliminada.' });
+        });
+    });
+});
+
+// PUT - Actualizar Historial de Reparación
+app.put('/api/reparaciones/:codigo/historial', (req, res) => {
+    const codigo = req.params.codigo;
+    const { historial } = req.body;
+
+    fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
+        const arr = JSON.parse(data || '[]');
+        const idx = arr.findIndex(r => r.codigo === codigo);
+        if (idx === -1) return res.status(404).json({ error: 'Reparación no encontrada.' });
+
+        arr[idx].historial = historial;
+
+        fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
+            if (err) return res.status(500).json({ error: 'Error al actualizar historial.' });
+            res.json({ mensaje: 'Historial actualizado.' });
         });
     });
 });

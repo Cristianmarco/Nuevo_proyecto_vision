@@ -29,17 +29,49 @@
     <nav>
       <ul>
         <li><a href="/main"><i class="fas fa-home"></i> Inicio</a></li>
-        <li><a href="/externos"><i class="fas fa-users"></i> Clientes</a></li>
-        <li><a href="/stock" class="active"><i class="fas fa-tools"></i> Stock</a></li>
-        <li><a href="#"><i class="fas fa-check-circle"></i> Entregadas</a></li>
+        <li>
+          <a href="javascript:void(0);" onclick="toggleSubmenu()">
+            <i class="fas fa-users"></i> Clientes
+            <i class="fas fa-chevron-down submenu-icon" id="submenu-icon"></i>
+          </a>
+          <ul class="submenu" id="clientes-submenu" style="display: none;">
+            <li><a href="/dota"><i class="fas fa-user-tie"></i> Dota</a></li>
+            <li><a href="/externos"><i class="fas fa-user-friends"></i> Externos</a></li>
+          </ul>
+        </li>
+        <li><a href="/reparaciones-vigentes"><i class="fas fa-tools"></i> Stock</a></li>
+        <li><a href="/reparaciones-entregadas"><i class="fas fa-check-circle"></i> Entregadas</a></li>
         <li><a href="#"><i class="fas fa-chart-line"></i> Reportes</a></li>
       </ul>
     </nav>
   </aside>
 
+  <script>
+    function toggleSubmenu() {
+      const submenu = document.getElementById('clientes-submenu');
+      submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Mostrar automáticamente el submenú si estamos en clientes
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = window.location.pathname;
+      if (path.includes('externos') || path.includes('dota')) {
+        document.getElementById('clientes-submenu').style.display = 'flex';
+      } else {
+        document.getElementById('clientes-submenu').style.display = 'none';
+      }
+    });
+  </script>
+
+
   <!-- CONTENT -->
   <main class="content">
     <h2>Gestión de Reparaciones Vigentes</h2>
+
+    <section class="busqueda-global">
+      <input type="text" id="busqueda-global" placeholder="Buscar en todas las reparaciones..."
+        oninput="buscarGlobal()">
+    </section>
 
     <!-- Tabla de Reparaciones -->
     <section class="table-section">
@@ -51,12 +83,13 @@
             <th>Tipo</th>
             <th>Modelo</th>
             <th>Cliente</th>
-            <th>Técnico</th>
             <th>ID</th>
             <th>Estado</th>
-            <th>Acción</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
+
         <tbody id="reparaciones-tbody">
           <!-- Datos de reparaciones se cargan con JS -->
         </tbody>
@@ -64,12 +97,13 @@
     </section>
 
     <!-- Iconos de Acciones -->
-    <section class="acciones-reparaciones">
-      <button class="icon-button visualizar"onclick="visualizarReparacion()"><i class="fas fa-eye"></i></button>
+    <section class="acciones-reparaciones fixed-actions">
+      <button class="icon-button visualizar" onclick="visualizarReparacion()"><i class="fas fa-eye"></i></button>
       <button class="icon-button agregar" onclick="abrirModalAgregar()"><i class="fas fa-plus"></i></button>
       <button class="icon-button modificar" onclick="abrirModalModificar()"><i class="fas fa-edit"></i></button>
       <button class="icon-button eliminar" onclick="eliminarReparacion()"><i class="fas fa-trash"></i></button>
     </section>
+
   </main>
 
   <!-- Modales (Agregar y Modificar Reparación) -->
@@ -83,7 +117,6 @@
         <input type="text" name="tipo" placeholder="Tipo" required />
         <input type="text" name="modelo" placeholder="Modelo" />
         <input type="text" name="cliente" placeholder="Cliente" required />
-        <input type="text" name="tecnico" placeholder="Técnico" />
         <input type="text" name="id" placeholder="ID" />
         <input type="text" name="estado" placeholder="Estado" />
         <button type="submit" class="btn-guardar">Guardar</button>
@@ -108,6 +141,38 @@
       </form>
     </div>
   </div>
+
+  <!-- MODAL HISTORIAL (VISUALIZACIÓN) -->
+  <div id="modal-historial" class="modal" style="display:none;">
+    <div class="modal-contenido" style="width: 500px;">
+      <span class="cerrar" onclick="cerrarModalHistorial()" style="cursor:pointer;">&times;</span>
+      <h2 id="historial-titulo">Historial de Reparación</h2>
+      <div id="datos-equipo" style="margin-bottom: 15px;"></div>
+      <textarea id="campo-historial" readonly
+        style="width:100%; height:200px; resize:none; padding:10px; border-radius:5px; border:1px solid #ccc;"></textarea>
+      <div style="margin-top: 15px; display: flex; justify-content: space-between;">
+        <button class="btn-guardar" onclick="abrirModalAgregarHistorial()">Agregar Reparación</button>
+        <button class="btn-guardar" onclick="cerrarModalHistorial()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AGREGAR HISTORIAL (NUEVO REGISTRO) -->
+  <div id="modal-agregar-historial" class="modal" style="display:none;">
+    <div class="modal-contenido" style="width: 500px;">
+      <span class="cerrar" onclick="cerrarModalAgregarHistorial()" style="cursor:pointer;">&times;</span>
+      <h2>Agregar Registro de Reparación</h2>
+      <input type="date" id="fecha-reparacion"
+        style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;" required>
+      <textarea id="cambios-reparacion" placeholder="Cambios realizados (repuestos)..."
+        style="width:100%; height:80px; resize:none; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:10px;"></textarea>
+      <textarea id="observaciones-reparacion" placeholder="Observaciones..."
+        style="width:100%; height:100px; resize:none; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:15px;"></textarea>
+      <button class="btn-guardar" onclick="guardarHistorial()">Guardar</button>
+    </div>
+  </div>
+
+
 
   <!-- SCRIPTS -->
   <script src="/scripts/reparaciones_vigentes.js"></script>

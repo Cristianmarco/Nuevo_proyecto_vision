@@ -37,56 +37,75 @@
         <li><a href="/main"><i class="fas fa-home"></i> Inicio</a></li>
         <li>
           <a href="javascript:void(0);" onclick="toggleSubmenu()">
-            <i class="fas fa-users"></i> Clientes <i class="fas fa-chevron-down submenu-icon" id="submenu-icon"></i>
+            <i class="fas fa-users"></i> Clientes
+            <i class="fas fa-chevron-down submenu-icon" id="submenu-icon"></i>
           </a>
-          <ul class="submenu" id="clientes-submenu" style="display: flex;">
+          <ul class="submenu" id="clientes-submenu" style="display: none;">
             <li><a href="/dota"><i class="fas fa-user-tie"></i> Dota</a></li>
-            <li><a href="/externos" class="active"><i class="fas fa-user-friends"></i> Externos</a></li>
+            <li><a href="/externos"><i class="fas fa-user-friends"></i> Externos</a></li>
           </ul>
         </li>
-        <li><a href="#"><i class="fas fa-tools"></i> Stock</a></li>
-        <li><a href="#"><i class="fas fa-check-circle"></i> Entregadas</a></li>
+        <li><a href="/reparaciones-vigentes"><i class="fas fa-tools"></i> Vigentes</a></li>
+        <li><a href="/reparaciones-entregadas"><i class="fas fa-check-circle"></i> Entregadas</a></li>
         <li><a href="#"><i class="fas fa-chart-line"></i> Reportes</a></li>
       </ul>
     </nav>
   </aside>
 
+  <script>
+    function toggleSubmenu() {
+      const submenu = document.getElementById('clientes-submenu');
+      submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Mostrar automáticamente el submenú si estamos en clientes
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = window.location.pathname;
+      if (path.includes('externos') || path.includes('dota')) {
+        document.getElementById('clientes-submenu').style.display = 'flex';
+      } else {
+        document.getElementById('clientes-submenu').style.display = 'none';
+      }
+    });
+  </script>
+
+
   <!-- CONTENT -->
   <main class="content">
-  <!-- Fichas Principales -->
-  <section id="seccion-principal" style="display: flex;">
-    <div class="dashboard-cards">
-      <div class="card" onclick="irAClientes()">
-        <div class="card-icon"><i class="fas fa-users"></i></div>
-        <div class="card-info">
-          <h3>Clientes</h3>
-          <p>Gestión completa de clientes</p>
+    <!-- Fichas Principales -->
+    <section id="seccion-principal" style="display: flex;">
+      <div class="dashboard-cards">
+        <div class="card" onclick="irAClientes()">
+          <div class="card-icon"><i class="fas fa-users"></i></div>
+          <div class="card-info">
+            <h3>Clientes</h3>
+            <p>Gestión completa de clientes</p>
+          </div>
+        </div>
+
+        <div class="card" onclick="mostrarSubmenuReparaciones()">
+          <div class="card-icon"><i class="fas fa-tools"></i></div>
+          <div class="card-info">
+            <h3>Reparaciones</h3>
+            <p>Vigentes y Entregadas</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="card" onclick="mostrarSubmenuReparaciones()">
-        <div class="card-icon"><i class="fas fa-tools"></i></div>
-        <div class="card-info">
-          <h3>Reparaciones</h3>
-          <p>Vigentes y Entregadas</p>
-        </div>
+    <!-- Submenú Reparaciones -->
+    <section id="submenu-reparaciones" class="submenu-reparaciones" style="display: none;">
+      <div class="small-card" onclick="window.location.href='/reparaciones-vigentes'">
+        <i class="fas fa-wrench"></i>
+        <span>Vigentes</span>
       </div>
-    </div>
-  </section>
-
-  <!-- Submenú Reparaciones -->
-  <section id="submenu-reparaciones" class="submenu-reparaciones" style="display: none;">
-    <div class="small-card" onclick="window.location.href='/reparaciones-vigentes'">
-      <i class="fas fa-wrench"></i>
-      <span>Vigentes</span>
-    </div>
-    <div class="small-card" onclick="window.location.href='/reparaciones-entregadas'">
-      <i class="fas fa-box"></i>
-      <span>Entregadas</span>
-    </div>
-    <button class="btn-volver" onclick="volverASeccionPrincipal()">Volver</button>
-  </section>
-</main>
+      <div class="small-card" onclick="window.location.href='/reparaciones-entregadas'">
+        <i class="fas fa-box"></i>
+        <span>Entregadas</span>
+      </div>
+      <button class="btn-volver" onclick="volverASeccionPrincipal()">Volver</button>
+    </section>
+  </main>
 
 
   <!-- Iconos de Acciones -->
@@ -106,7 +125,7 @@
     </button>
 
   </section>
-</main>
+  </main>
   <script src="/scripts/logout.js"></script>
   <script src="/scripts/abm_clientes.js"></script>
   <script src="/scripts/dashboard.js"></script>

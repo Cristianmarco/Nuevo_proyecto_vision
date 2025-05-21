@@ -13,8 +13,10 @@ async function cargarClientes() {
     }
 }
 
-function renderizarClientes(clientes) {
-    const tbody = document.querySelector(".tabla-clientes tbody");
+function renderizarClientes(clientes = []) {
+    const tbody = document.getElementById("clientes-tbody");
+    if (!tbody) return; // Si no existe la tabla, no intentes modificarla
+
     tbody.innerHTML = "";
 
     clientes.forEach((cliente, index) => {
@@ -30,14 +32,16 @@ function renderizarClientes(clientes) {
             <td>${cliente.mail}</td>
             <td>${cliente.documento}</td>
         `;
-        row.addEventListener("click", () => seleccionarFila(index));
+
+        row.addEventListener("click", () => seleccionarFila(index, "clientes-tbody"));
+        
         tbody.appendChild(row);
     });
 }
 
-function seleccionarFila(index) {
-    const filas = document.querySelectorAll(".tabla-clientes tbody tr");
-    filas.forEach(fila => fila.classList.remove("seleccionado"));
+function seleccionarFila(index, tablaId) {
+    const filas = document.querySelectorAll(`#${tablaId} tr`);
+    filas.forEach(f => f.classList.remove("seleccionado"));
     filas[index].classList.add("seleccionado");
 }
 
@@ -204,12 +208,19 @@ function formatearCampo(campo) {
     return nombres[campo] || campo;
 }
 
-document.getElementById("form-agregar").addEventListener("submit", function (e) {
-    e.preventDefault(); // Evita que recargue la página
-    agregarCliente();
-});
+const formAgregar = document.getElementById("form-agregar");
+if (formAgregar) {
+    formAgregar.addEventListener("submit", function (e) {
+        e.preventDefault();
+        agregarCliente();
+    });
+}
 
-document.getElementById("form-modificar").addEventListener("submit", function (e) {
-    e.preventDefault();
-    modificarCliente();
-});
+const formModificar = document.getElementById("form-modificar");
+if (formModificar) {
+    formModificar.addEventListener("submit", function (e) {
+        e.preventDefault();
+        modificarCliente();
+    });
+}
+

@@ -30,13 +30,41 @@
         <nav>
             <ul>
                 <li><a href="/main"><i class="fas fa-home"></i> Inicio</a></li>
-                <li><a href="/externos" class="active"><i class="fas fa-users"></i> Clientes</a></li>
-                <li><a href="/stock"><i class="fas fa-tools"></i> Stock</a></li>
-                <li><a href="#"><i class="fas fa-check-circle"></i> Entregadas</a></li>
+                <li>
+                    <a href="javascript:void(0);" onclick="toggleSubmenu()">
+                        <i class="fas fa-users"></i> Clientes
+                        <i class="fas fa-chevron-down submenu-icon" id="submenu-icon"></i>
+                    </a>
+                    <ul class="submenu" id="clientes-submenu" style="display: none;">
+                        <li><a href="/dota"><i class="fas fa-user-tie"></i> Dota</a></li>
+                        <li><a href="/externos"><i class="fas fa-user-friends"></i> Externos</a></li>
+                    </ul>
+                </li>
+                <li><a href="/reparaciones-vigentes"><i class="fas fa-tools"></i> Stock</a></li>
+                <li><a href="/reparaciones-entregadas"><i class="fas fa-check-circle"></i> Entregadas</a></li>
                 <li><a href="#"><i class="fas fa-chart-line"></i> Reportes</a></li>
             </ul>
         </nav>
     </aside>
+
+    <script>
+        function toggleSubmenu() {
+            const submenu = document.getElementById('clientes-submenu');
+            submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Mostrar automáticamente el submenú si estamos en clientes
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname;
+            if (path.includes('externos') || path.includes('dota')) {
+                document.getElementById('clientes-submenu').style.display = 'flex';
+            } else {
+                document.getElementById('clientes-submenu').style.display = 'none';
+            }
+        });
+    </script>
+
+
 
     <!-- CONTENT -->
     <main class="content">

@@ -14,12 +14,6 @@
   background-color: #cc0000;
 }
 
-.acciones-clientes {
-  margin-top: 20px;
-  display: flex;
-  gap: 15px;
-  justify-content: flex-start;
-}
 
 .icon-button {
   background-color: #ccc;
@@ -82,17 +76,3 @@
   background-color: #344c53;
 }
 
-.btn-volver {
-  background-color: #4da6ff;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: background-color 0.3s;
-}
-
-.btn-volver:hover {
-  background-color: #1175d8;
-}

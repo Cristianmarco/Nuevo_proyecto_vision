@@ -94,3 +94,14 @@
 .logout-button:hover {
   background-color: #cc0000;
 }
+
+.submenu {
+    display: none;
+    flex-direction: column; /* Asegura que los elementos estén uno debajo del otro */
+    padding-left: 20px;
+}
+
+.submenu li {
+    margin: 5px 0;
+}
+

@@ -30,17 +30,54 @@
     <nav>
       <ul>
         <li><a href="/main"><i class="fas fa-home"></i> Inicio</a></li>
-        <li><a href="/externos"><i class="fas fa-users"></i> Clientes</a></li>
-        <li><a href="/stock"><i class="fas fa-tools"></i> Stock</a></li>
-        <li><a href="/entregadas" class="active"><i class="fas fa-check-circle"></i> Entregadas</a></li>
+        <li>
+          <a href="javascript:void(0);" onclick="toggleSubmenu()">
+            <i class="fas fa-users"></i> Clientes
+            <i class="fas fa-chevron-down submenu-icon" id="submenu-icon"></i>
+          </a>
+          <ul class="submenu" id="clientes-submenu" style="display: none;">
+            <li><a href="/dota"><i class="fas fa-user-tie"></i> Dota</a></li>
+            <li><a href="/externos"><i class="fas fa-user-friends"></i> Externos</a></li>
+          </ul>
+        </li>
+        <li><a href="/reparaciones-vigentes"><i class="fas fa-tools"></i> Stock</a></li>
+        <li><a href="/reparaciones-entregadas"><i class="fas fa-check-circle"></i> Entregadas</a></li>
         <li><a href="#"><i class="fas fa-chart-line"></i> Reportes</a></li>
       </ul>
     </nav>
   </aside>
 
+  <script>
+    function toggleSubmenu() {
+      const submenu = document.getElementById('clientes-submenu');
+      submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Mostrar automáticamente el submenú si estamos en clientes
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = window.location.pathname;
+      if (path.includes('externos') || path.includes('dota')) {
+        document.getElementById('clientes-submenu').style.display = 'flex';
+      } else {
+        document.getElementById('clientes-submenu').style.display = 'none';
+      }
+    });
+  </script>
+
+
+
+
+
+
   <!-- CONTENT -->
   <main class="content">
     <h2>Listado de Reparaciones Entregadas</h2>
+
+    <section class="busqueda-global">
+      <input type="text" id="busqueda-global" placeholder="Buscar en todas las reparaciones..."
+        oninput="buscarGlobal()">
+    </section>
+
 
     <section class="table-section">
       <table class="tabla-reparaciones">
@@ -54,7 +91,7 @@
             <th>Técnico</th>
             <th>ID</th>
             <th>Estado</th>
-            <th>Fecha de Entrega</th> 
+            <th>Fecha de Entrega</th>
           </tr>
         </thead>
 
@@ -64,6 +101,28 @@
       </table>
     </section>
   </main>
+
+  <div id="modal-historial" class="modal">
+    <div class="modal-contenido">
+      <span class="cerrar" onclick="cerrarModalHistorial()">&times;</span>
+      <h2 id="historial-id"></h2>
+      <p id="historial-encabezado"></p>
+      <textarea id="historial-texto" readonly></textarea>
+      <button class="btn-agregar-historial" onclick="abrirModalAgregarHistorial()">Agregar Reparación</button>
+      <button class="btn-guardar" onclick="cerrarModalHistorial()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Reparaciones al Historial -->
+  <div id="modal-agregar-historial" class="modal">
+    <div class="modal-contenido">
+      <span class="cerrar" onclick="cerrarModalAgregarHistorial()">&times;</span>
+      <h2>Agregar Registro de Reparación</h2>
+      <textarea id="nuevo-historial" placeholder="Describe la reparación..."></textarea>
+      <button class="btn-guardar" onclick="guardarHistorial()">Guardar</button>
+    </div>
+  </div>
+
 
   <!-- SCRIPTS -->
   <script src="/scripts/entregadas.js"></script>

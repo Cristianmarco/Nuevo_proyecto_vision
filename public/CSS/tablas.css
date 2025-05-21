@@ -1,188 +1,266 @@
-/* ======= [TABLAS CSS CARGADO] ======= */
-
-.tabla-clientes {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-  overflow: hidden;
-  font-size: 14px;
+/* ======= GENERAL ======= */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    color: #333;
 }
 
-.tabla-clientes thead {
-  background-color: #00FF00;
-  color: #ffffff;
+h1, h2 {
+    text-align: center;
+    color: #333;
 }
 
-.tabla-clientes th,
-.tabla-clientes td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #dddddd;
-  width: 11.11%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tabla-clientes tbody tr:hover {
-  background-color: #f2f2f2;
-}
-
-.tabla-clientes tr.seleccionado {
-  background-color: #d1ffd1;
-}
-
-#entregadas-panel h2 {
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-  color: #000;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-#entregadas-panel table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-#entregadas-panel th,
-#entregadas-panel td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #ccc;
-  text-align: left;
-}
-
-#entregadas-panel tr:hover {
-  background-color: #f5f5f5;
-}
-
-#entregadas-panel td:nth-child(1) {
-  font-weight: bold;
-  color: #333;
-}
-
-/* ======= [ESTILO TABLA ABM CLIENTES] ======= */
-
-.tabla-clientes {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
-  font-size: 14px;
-}
-
-.tabla-clientes thead {
-  background-color: #4da6ff; /* Azulino moderno */
-  color: #fff;
-}
-
-.tabla-clientes th,
-.tabla-clientes td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tabla-clientes tbody tr:hover {
-  background-color: #f5faff;
-}
-
-.tabla-clientes tr.seleccionado {
-  background-color: #d1ffd1; /* Verde claro para fila seleccionada */
-}
-
-.tabla-clientes th:first-child,
-.tabla-clientes td:first-child {
-  border-left: none;
-}
-
-.tabla-clientes th:last-child,
-.tabla-clientes td:last-child {
-  border-right: none;
-}
-
-/* ======= Estilo Tabla de Reparaciones ======= */
-.tabla-reparaciones {
+/* ======= BUSCADOR GLOBAL ======= */
+.busqueda-global {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
     width: 100%;
+}
+
+#busqueda-global {
+    width: 60%;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+#busqueda-global:focus {
+    outline: none;
+    border-color: #4da6ff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* ======= TABLAS ======= */
+.tabla-reparaciones, .tabla-clientes {
+    width: 100%;
+    margin: 0 auto;
     border-collapse: collapse;
     background-color: #ffffff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border-radius: 10px;
-    overflow: hidden;
     font-size: 14px;
 }
 
-.tabla-reparaciones thead {
-    background-color: #007BFF;
-    color: #ffffff;
+.tabla-reparaciones thead, .tabla-clientes thead {
+    background: linear-gradient(to right, #4da6ff, #1a73e8);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
-.tabla-reparaciones th, 
-.tabla-reparaciones td {
+.tabla-reparaciones th, .tabla-reparaciones td,
+.tabla-clientes th, .tabla-clientes td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #dddddd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.tabla-reparaciones tbody tr:hover {
-    background-color: #f2f2f2;
+.tabla-reparaciones tbody tr:hover,
+.tabla-clientes tbody tr:hover {
+    background-color: #f5faff;
+    cursor: pointer;
 }
 
-.tabla-reparaciones tr.seleccionado {
-    background-color: #d1ffd1;
+tr.seleccionado {
+    background-color: #d1ffd1 !important;
 }
 
-/* ======= Botones de Acciones ======= */
+/* ======= RESPONSIVE ======= */
+@media (max-width: 768px) {
+    .tabla-clientes, .tabla-reparaciones {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .tabla-clientes thead, .tabla-reparaciones thead {
+        display: none;
+    }
+
+    .tabla-clientes tr, .tabla-reparaciones tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #fff;
+    }
+
+    .tabla-clientes td, .tabla-reparaciones td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .tabla-clientes td::before, .tabla-reparaciones td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #555;
+    }
+}
+
+/* ======= SEMÁFORO ======= */
+.semaforo {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-left: 8px;
+    border: 2px solid #ccc;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+
+.verde { background-color: #66bb6a; }
+.naranja { background-color: #ffa726; }
+.amarillo { background-color: #ffeb3b; }
+.rojo { background-color: #ef5350; }
+
+/* ======= BOTONES ======= */
+.icon-button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    transform: scale(1.1);
+    background-color: #0056b3;
+}
+
+.btn-terminado, .btn-guardar, .btn-volver {
+    padding: 10px 20px;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-terminado { background-color: #28a745; }
+.btn-terminado:hover { background-color: #218838; transform: scale(1.05); }
+
+.btn-guardar { background-color: #007BFF; }
+.btn-guardar:hover { background-color: #0056b3; transform: scale(1.05); }
+
+.btn-volver { background-color: #4da6ff; margin-top: 20px; }
+.btn-volver:hover { background-color: #1175d8; }
+
+/* ======= MODALES ======= */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-contenido {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: fadeInScale 0.3s ease;
+}
+
+@keyframes fadeInScale {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.cerrar {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 24px;
+    color: #555;
+    cursor: pointer;
+}
+
+.estado-select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 180px;
+}
+
+.estado-select:hover {
+    border-color: #4da6ff;
+    box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.2);
+}
+
+.estado-select:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+}
+
+
+
+
+/* ======= NOTIFICACIONES ======= */
+#notificacion-busqueda {
+    position: fixed;
+    top: 80px;
+    right: 30px;
+    background-color: #4da6ff;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 2000;
+    display: none;
+    font-size: 14px;
+}
+
+/* ======= ACCIONES CLIENTES ======= */
+.acciones-clientes {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    flex-direction: row; 
+}
+
 .acciones-reparaciones {
     margin-top: 20px;
     display: flex;
     gap: 15px;
-}
-
-.icon-button {
-    background-color: #ccc;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.icon-button:hover {
-    transform: scale(1.2);
-    opacity: 0.9;
-}
-
-.icon-button.visualizar { background-color: #5bc0de; }
-.icon-button.agregar    { background-color: #5cb85c; }
-.icon-button.modificar  { background-color: #f0ad4e; }
-.icon-button.eliminar   { background-color: #d9534f; }
-
-.btn-terminado {
-    padding: 5px 10px;
-    background-color: #4a6c78;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-terminado:hover {
-    background-color: #3d5a63;
-    transform: scale(1.05);
+    justify-content: flex-start;
+    flex-direction: row; 
 }
