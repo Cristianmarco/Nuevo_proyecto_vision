@@ -2,7 +2,7 @@
 
 /* SIDEBAR */
 .sidebar {
-  width: 240px;
+  width: 250px;
   background-color: #4da6ff; /* Azul claro */
   position: fixed;
   top: 70px; /* Justo debajo del header */

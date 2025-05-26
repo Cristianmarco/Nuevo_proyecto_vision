@@ -5,8 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reparaciones Vigentes</title>
-
-  <!-- Estilos -->
   <link rel="stylesheet" href="/css/layout.css" />
   <link rel="stylesheet" href="/css/tablas.css" />
   <link rel="stylesheet" href="/css/modales.css" />
@@ -16,7 +14,6 @@
 </head>
 
 <body class="main-dashboard">
-  <!-- HEADER -->
   <header class="main-header">
     <div class="logo">
       <img src="/logo.png" alt="Logo Empresa" height="40" />
@@ -24,7 +21,6 @@
     <h1>Reparaciones Vigentes</h1>
   </header>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <nav>
       <ul>
@@ -46,40 +42,18 @@
     </nav>
   </aside>
 
-  <script>
-    function toggleSubmenu() {
-      const submenu = document.getElementById('clientes-submenu');
-      submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    // Mostrar automáticamente el submenú si estamos en clientes
-    document.addEventListener('DOMContentLoaded', () => {
-      const path = window.location.pathname;
-      if (path.includes('externos') || path.includes('dota')) {
-        document.getElementById('clientes-submenu').style.display = 'flex';
-      } else {
-        document.getElementById('clientes-submenu').style.display = 'none';
-      }
-    });
-  </script>
-
-
-  <!-- CONTENT -->
   <main class="content">
     <h2>Gestión de Reparaciones Vigentes</h2>
-
     <section class="busqueda-global">
       <input type="text" id="busqueda-global" placeholder="Buscar en todas las reparaciones..."
         oninput="buscarGlobal()">
     </section>
-
-    <!-- Tabla de Reparaciones -->
     <section class="table-section">
       <table class="tabla-reparaciones">
         <thead>
           <tr>
             <th>Fecha de Ingreso</th>
-            <th>Código</th>
+            <th>Coche/Código</th>
             <th>Tipo</th>
             <th>Modelo</th>
             <th>Cliente</th>
@@ -87,26 +61,21 @@
             <th>Estado</th>
             <th></th>
             <th></th>
+            <th>Garantía</th>
           </tr>
         </thead>
-
-        <tbody id="reparaciones-tbody">
-          <!-- Datos de reparaciones se cargan con JS -->
-        </tbody>
+        <tbody id="reparaciones-tbody"></tbody>
       </table>
     </section>
-
-    <!-- Iconos de Acciones -->
     <section class="acciones-reparaciones fixed-actions">
       <button class="icon-button visualizar" onclick="visualizarReparacion()"><i class="fas fa-eye"></i></button>
       <button class="icon-button agregar" onclick="abrirModalAgregar()"><i class="fas fa-plus"></i></button>
       <button class="icon-button modificar" onclick="abrirModalModificar()"><i class="fas fa-edit"></i></button>
       <button class="icon-button eliminar" onclick="eliminarReparacion()"><i class="fas fa-trash"></i></button>
     </section>
-
   </main>
 
-  <!-- Modales (Agregar y Modificar Reparación) -->
+  <!-- Modales Agregar / Modificar / Visualizar -->
   <div id="modal-agregar" class="modal">
     <div class="modal-contenido">
       <span class="cerrar" onclick="cerrarModalAgregar()">&times;</span>
@@ -119,6 +88,9 @@
         <input type="text" name="cliente" placeholder="Cliente" required />
         <input type="text" name="id" placeholder="ID" />
         <input type="text" name="estado" placeholder="Estado" />
+        <label class="checkbox-label">
+          <input type="checkbox" name="garantia"> Garantía
+        </label>
         <button type="submit" class="btn-guardar">Guardar</button>
       </form>
     </div>
@@ -134,47 +106,59 @@
         <input type="text" name="tipo" placeholder="Tipo" required />
         <input type="text" name="modelo" placeholder="Modelo" />
         <input type="text" name="cliente" placeholder="Cliente" required />
-        <input type="text" name="tecnico" placeholder="Técnico" />
         <input type="text" name="id" placeholder="ID" />
         <input type="text" name="estado" placeholder="Estado" />
+        <label class="checkbox-label">
+          <input type="checkbox" name="garantia"> Garantía
+        </label>
         <button type="submit" class="btn-guardar">Guardar Cambios</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL HISTORIAL (VISUALIZACIÓN) -->
-  <div id="modal-historial" class="modal" style="display:none;">
-    <div class="modal-contenido" style="width: 500px;">
-      <span class="cerrar" onclick="cerrarModalHistorial()" style="cursor:pointer;">&times;</span>
-      <h2 id="historial-titulo">Historial de Reparación</h2>
-      <div id="datos-equipo" style="margin-bottom: 15px;"></div>
-      <textarea id="campo-historial" readonly
-        style="width:100%; height:200px; resize:none; padding:10px; border-radius:5px; border:1px solid #ccc;"></textarea>
-      <div style="margin-top: 15px; display: flex; justify-content: space-between;">
-        <button class="btn-guardar" onclick="abrirModalAgregarHistorial()">Agregar Reparación</button>
-        <button class="btn-guardar" onclick="cerrarModalHistorial()">Cerrar</button>
+  <div id="modal-historial" class="modal">
+    <div class="modal-contenido" style="max-width: 600px;">
+      <span class="cerrar" onclick="cerrarModalHistorial()">&times;</span>
+      <h2 class="modal-titulo-principal" id="historial-titulo">ID: 0000</h2>
+
+      <!-- Datos del equipo -->
+      <div class="historial-datos" id="datos-equipo">
+        <p><strong>Código:</strong> <span id="dato-codigo"></span></p>
+        <p><strong>Tipo:</strong> <span id="dato-tipo"></span></p>
+        <p><strong>Modelo:</strong> <span id="dato-modelo"></span></p>
+        <p><strong>Cliente:</strong> <span id="dato-cliente"></span></p>
+      </div>
+
+      <h3 class="modal-subtitulo">Historial de Reparaciones</h3>
+      <textarea id="campo-historial" readonly class="historial-textarea"></textarea>
+
+      <div class="historial-actions">
+        <button type="button" class="btn-historial agregar" onclick="abrirModalAgregarHistorial()">
+          <i class="fas fa-plus-circle"></i> <span>Agregar Registro</span>
+        </button>
       </div>
     </div>
   </div>
 
+
   <!-- MODAL AGREGAR HISTORIAL (NUEVO REGISTRO) -->
   <div id="modal-agregar-historial" class="modal" style="display:none;">
-    <div class="modal-contenido" style="width: 500px;">
-      <span class="cerrar" onclick="cerrarModalAgregarHistorial()" style="cursor:pointer;">&times;</span>
-      <h2>Agregar Registro de Reparación</h2>
-      <input type="date" id="fecha-reparacion"
-        style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;" required>
-      <textarea id="cambios-reparacion" placeholder="Cambios realizados (repuestos)..."
-        style="width:100%; height:80px; resize:none; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:10px;"></textarea>
-      <textarea id="observaciones-reparacion" placeholder="Observaciones..."
-        style="width:100%; height:100px; resize:none; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:15px;"></textarea>
-      <button class="btn-guardar" onclick="guardarHistorial()">Guardar</button>
+    <div class="modal-contenido" style="width: 500px; padding-top: 60px; position: relative;">
+      <span class="cerrar" onclick="cerrarModalAgregarHistorial()">
+        <i class="fas fa-times"></i>
+      </span>
+      <h2 style="text-align: center; font-size: 22px; margin-bottom: 20px;">Agregar Registro de Reparación</h2>
+      <input type="date" id="fecha-reparacion" class="campo-modal" required>
+      <textarea id="cambios-reparacion" class="campo-modal" placeholder="Cambios realizados (repuestos)..."
+        required></textarea>
+      <textarea id="observaciones-reparacion" class="campo-modal" placeholder="Observaciones..." required></textarea>
+      <input type="text" id="tecnico-reparacion" class="campo-modal" placeholder="Técnico" required>
+      <button class="btn-historial btn-guardar" onclick="guardarHistorial()">
+        <i class="fas fa-save"></i> Guardar
+      </button>
     </div>
   </div>
 
-
-
-  <!-- SCRIPTS -->
   <script src="/scripts/reparaciones_vigentes.js"></script>
   <script src="/scripts/sidebar.js"></script>
 </body>
