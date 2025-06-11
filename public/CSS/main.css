@@ -7,4 +7,40 @@
 @import url('/css/botones.css');
 @import url('/css/animaciones.css');
 @import url('/css/dashboard.css');
+@import url('/css/bienvenida.css');
 
+.logo-animado-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.logo-animado {
+  width: 300px;  /* Ajustá según necesites */
+  opacity: 0;
+  transform: scale(0.2);
+  animation: fadeZoom 2s ease-in-out forwards;
+}
+
+@keyframes fadeZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.bienvenida-texto {
+  font-size: 28px;
+  color: #0072ff;
+  margin-top: 20px;
+  animation: fadeIn 2s ease-in-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

@@ -1,6 +1,7 @@
 /* ======= [LAYOUT CSS CARGADO] ======= */
 
 /* SIDEBAR */
+/* === SIDEBAR === */
 .sidebar {
   width: 250px;
   background-color: #4da6ff; /* Azul claro */
@@ -25,6 +26,7 @@
   width: 100%;
 }
 
+/* === ENLACES BLANCOS === */
 .sidebar nav ul li a {
   color: #fff;
   text-decoration: none;
@@ -41,6 +43,28 @@
   background-color: #1175d8;
   border-radius: 8px;
 }
+
+/* === BOTONES (DOTA y EXTERNOS) === */
+.sidebar-btn {
+  background: linear-gradient(to right, #4da6ff, #1a73e8);
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  padding: 12px 20px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.3s;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-btn:hover {
+  background: linear-gradient(to right, #1a73e8, #4da6ff);
+}
+
 
 /* MAIN CONTENT */
 .content {
@@ -104,4 +128,23 @@
 .submenu li {
     margin: 5px 0;
 }
+
+.header {
+  display: flex;
+  align-items: center;    /* Centra verticalmente el logo */
+  padding: 0 20px;        /* Espacio a los lados */
+  height: auto;           /* Permite ajustar al contenido */
+  min-height: 80px;       /* Establece una altura mínima */
+  background-color: #1f1f1f; /* Ajusta el color de fondo */
+}
+
+.logo-header {
+  height: 60px;           /* Ajusta según lo que desees */
+  max-height: 80px;       /* No excede el tamaño máximo del header */
+  width: auto;            /* Mantiene la proporción de la imagen */
+  animation: none !important;  /* Desactiva la animación heredada */
+  margin-right: 20px;     /* Espacio a la derecha */
+}
+
+
 

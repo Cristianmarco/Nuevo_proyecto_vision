@@ -1,13 +1,30 @@
 let reparaciones = [];
 
-// Al iniciar, cargar las reparaciones
+let codigoActual = null;
+
+let resultadosBusqueda = []; // nueva global
+
+let codigoOriginal = ""; 
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
-    cargarReparaciones();
+    const rol = localStorage.getItem('rol');
+    const usuario = localStorage.getItem('username');
+    if (rol === 'CLIENTE' && usuario) {
+        cargarReparaciones(usuario);
+    } else {
+        cargarReparaciones();
+    }
 });
 
-async function cargarReparaciones() {
+async function cargarReparaciones(cliente = '') {
     try {
-        const response = await fetch('/api/reparaciones');
+        let url = '/api/reparaciones';
+        if (cliente) {
+            url += `?cliente=${encodeURIComponent(cliente)}`;
+        }
+        const response = await fetch(url);
         reparaciones = await response.json();
         renderizarTabla();
     } catch (error) {
@@ -15,52 +32,53 @@ async function cargarReparaciones() {
     }
 }
 
+
 function formatearFecha(fechaISO) {
     if (!fechaISO) return "-";
-    const fecha = new Date(fechaISO);
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-    const anio = fecha.getFullYear();
-    return `${dia}/${mes}/${anio}`;
+    const [anio, mes, dia] = fechaISO.split('-');
+    const fecha = new Date(anio, mes - 1, dia);  // Evita problemas de zona horaria
+    const diaFormateado = String(fecha.getDate()).padStart(2, '0');
+    const mesFormateado = String(fecha.getMonth() + 1).padStart(2, '0');
+    return `${diaFormateado}/${mesFormateado}/${anio}`;
 }
 
-
-function renderizarTabla() {
+function renderizarTabla(lista = reparaciones) {
     const tbody = document.getElementById("reparaciones-tbody");
     tbody.innerHTML = "";
 
-    reparaciones.forEach((rep, index) => {
-        const fechaIngreso = new Date(rep.fechaIngreso);
-        const hoy = new Date();
-        const diffDias = Math.floor((hoy - fechaIngreso) / (1000 * 60 * 60 * 24));
-        const alertaClase = diffDias > 21 ? 'alerta-fecha' : '';
-        const colorClase = obtenerColorEstado(rep.estado);
+    lista.forEach(rep => {
+        const realIndex = reparaciones.findIndex(r => r.codigo === rep.codigo);
 
         const row = document.createElement("tr");
+        row.setAttribute("data-index", realIndex);
 
         row.innerHTML = `
-      <td class="${alertaClase}">${formatearFecha(rep.fechaIngreso)}</td>
-      <td>${rep.codigo}</td>
-      <td>${rep.tipo}</td>
-      <td>${rep.modelo}</td>
-      <td>${rep.cliente}</td>
-      <td>${rep.id}</td>
-      <td>
-        <select class="estado-select" onchange="cambiarEstado('${rep.codigo}', this.value)">
-          <option value="Ingreso" ${rep.estado === 'Ingreso' ? 'selected' : ''}>Ingreso</option>
-          <option value="Esperando confirmacion" ${rep.estado === 'Esperando confirmacion' ? 'selected' : ''}>Esperando Confirmación</option>
-          <option value="Esperando repuesto" ${rep.estado === 'Esperando repuesto' ? 'selected' : ''}>Esperando Repuesto</option>
-          <option value="Salida" ${rep.estado === 'Salida' ? 'selected' : ''}>Salida</option>
-        </select>
-      </td>
-      <td><span class="semaforo ${colorClase}"></span></td>
-      <td>
-        <button class="btn-terminado" onclick="marcarTerminado('${rep.codigo}')">Terminado</button>
-      </td>
-      <td style="text-align: center;">${rep.garantia ? '✔️' : ''}</td>
-    `;
+            <td>${formatearFecha(rep.fechaIngreso)}</td>
+            <td>${rep.codigo}</td>
+            <td>${rep.tipo}</td>
+            <td>${rep.modelo}</td>
+            <td>${rep.cliente}</td>
+            <td>${rep.id}</td>
+            <td>
+                <select class="estado-select" onchange="cambiarEstado('${rep.codigo}', this.value)">
+                    <option value="Ingreso" ${rep.estado === 'Ingreso' ? 'selected' : ''}>Ingreso</option>
+                    <option value="Esperando confirmacion" ${rep.estado === 'Esperando confirmacion' ? 'selected' : ''}>Esperando Confirmación</option>
+                    <option value="Esperando repuesto" ${rep.estado === 'Esperando repuesto' ? 'selected' : ''}>Esperando Repuesto</option>
+                    <option value="Salida" ${rep.estado === 'Salida' ? 'selected' : ''}>Salida</option>
+                </select>
+            </td>
+            <td><span class="semaforo ${obtenerColorEstado(rep.estado)}"></span></td>
+            <td><button class="btn-terminado" onclick="marcarTerminado('${rep.codigo}')">Terminado</button></td>
+            <td style="text-align: center;">${rep.garantia ? '✔️' : ''}</td>
+        `;
 
-        row.addEventListener("click", () => seleccionarFila(index));
+        row.addEventListener("click", function () {
+            tbody.querySelectorAll("tr").forEach(f => f.classList.remove("seleccionado"));
+            this.classList.add("seleccionado");
+            codigoActual = rep.codigo;
+            console.log("Seleccionaste:", codigoActual);
+        });
+
         row.addEventListener("dblclick", () => visualizarReparacion());
 
         tbody.appendChild(row);
@@ -103,7 +121,10 @@ async function marcarTerminado(codigo) {
 
     if (confirm("¿Marcar esta reparación como terminada?")) {
         try {
-            rep.fechaEntrega = new Date().toISOString().split('T')[0];
+            
+            const hoy = new Date();
+            rep.fechaEntrega = hoy.toLocaleDateString('es-AR').split('/').reverse().join('-');
+
             const save = await fetch('/api/entregadas', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -127,19 +148,22 @@ function seleccionarFila(index) {
     const filas = document.querySelectorAll("#reparaciones-tbody tr");
     filas.forEach(f => f.classList.remove("seleccionado"));
     filas[index].classList.add("seleccionado");
+    // Actualiza codigoActual correctamente
+    if (reparaciones[index]) {
+        codigoActual = reparaciones[index].codigo;
+    }
 }
 
 function obtenerIndiceSeleccionado() {
-    const filas = document.querySelectorAll("#reparaciones-tbody tr");
-    let index = -1;
-    filas.forEach((f, i) => {
-        if (f.classList.contains("seleccionado")) index = i;
-    });
-    if (index === -1) alert("Selecciona una reparación primero.");
-    return index;
+    const fila = document.querySelector("#reparaciones-tbody tr.seleccionado");
+    if (!fila) return -1;
+
+    const codigoSeleccionado = fila.children[1].textContent.trim();
+
+    // Buscamos el índice real en reparaciones (aunque se haya mostrado desde una búsqueda)
+    return reparaciones.findIndex(r => r.codigo === codigoSeleccionado);
 }
 
-let codigoActual = null;
 
 // ========== Modal Agregar ==========
 function abrirModalAgregar() {
@@ -153,10 +177,22 @@ function cerrarModalAgregar() {
 
 // ========== Modal Modificar ==========
 function abrirModalModificar() {
-    const i = obtenerIndiceSeleccionado();
-    if (i === -1) return;
+    let index = obtenerIndiceSeleccionado();
 
-    const rep = reparaciones[i];
+    // Si no hay selección visible, intentamos buscar por el último codigoActual
+    if (index === -1 && codigoActual) {
+        index = reparaciones.findIndex(r => r.codigo === codigoActual);
+    }
+
+    if (index === -1) {
+        alert("Selecciona una reparación primero.");
+        return;
+    }
+
+    // Marca visualmente la fila en la tabla filtrada
+    seleccionarFila(index);
+
+    const rep = reparaciones[index];
     const form = document.getElementById("form-modificar");
 
     Object.keys(rep).forEach(k => {
@@ -169,11 +205,11 @@ function abrirModalModificar() {
         }
     });
 
-    document.getElementById("modal-modificar").style.display = "flex";
-}
+    codigoOriginal = rep.codigo;
+    codigoActual = rep.codigo;
 
-function cerrarModalModificar() {
-    document.getElementById("modal-modificar").style.display = "none";
+    // Mostrar el modal
+    document.getElementById("modal-modificar").style.display = "flex";
 }
 
 // ========== Modal Visualizar ==========
@@ -184,19 +220,54 @@ function visualizarReparacion() {
     const rep = reparaciones[index];
     codigoActual = rep.codigo;
 
+    // Título y datos principales del equipo
     document.getElementById("historial-titulo").textContent = `ID: ${rep.id}`;
-
     document.getElementById("datos-equipo").innerHTML = `
-      <p><strong>Código:</strong> ${rep.codigo}</p>
-      <p><strong>Tipo:</strong> ${rep.tipo}</p>
-      <p><strong>Modelo:</strong> ${rep.modelo}</p>
-      <p><strong>Cliente:</strong> ${rep.cliente}</p>
+        <p><strong>Código:</strong> ${rep.codigo}</p>
+        <p><strong>Tipo:</strong> ${rep.tipo}</p>
+        <p><strong>Modelo:</strong> ${rep.modelo}</p>
+        <p><strong>Cliente:</strong> ${rep.cliente}</p>
     `;
 
-    document.getElementById("campo-historial").value = rep.historial || "Sin historial disponible.";
+    // Asegurar que el historial sea un array
+    let historial = [];
+
+    if (Array.isArray(rep.historial)) {
+        historial = rep.historial;
+    } else if (typeof rep.historial === "string" && rep.historial.trim() !== "") {
+        // Convertir string plano en un solo objeto como fallback
+        historial = [{
+            fecha: '',
+            tecnico: '',
+            garantia: rep.garantia || false,
+            observaciones: rep.historial,
+            repuestos: ''
+        }];
+    }
+
+    // Renderizar cada entrada del historial como bloque HTML
+    const contenedor = document.getElementById("campo-historial");
+    contenedor.innerHTML = historial.map(evento => `
+        <div class="historial-registro">
+            <table>
+                <tr>
+                    <td><strong>Fecha:</strong> ${formatearFecha(evento.fecha)}</td>
+                    <td><strong>Técnico:</strong> ${evento.tecnico}</td>
+                    <td><strong>Garantía:</strong> ${evento.garantia ? 'Sí' : 'No'}</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>Observaciones:</strong> ${evento.observaciones}</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>Repuestos:</strong> ${evento.repuestos}</td>
+                </tr>
+            </table>
+        </div>
+    `).join('');
+
+    // Mostrar modal
     document.getElementById("modal-historial").style.display = "flex";
 }
-
 
 
 function cerrarModalHistorial() {
@@ -205,24 +276,29 @@ function cerrarModalHistorial() {
 
 // ========== Modal Agregar Historial ==========
 function abrirModalAgregarHistorial() {
+    if (!codigoActual) {
+        alert("Selecciona una reparación primero.");
+        return;
+    }
     document.getElementById("modal-agregar-historial").style.display = "flex";
 }
 
-function cerrarModalAgregarHistorial() {
-  const modal = document.getElementById("modal-agregar-historial");
-  if (modal) modal.style.display = "none";
 
-  // Limpiar todos los campos
-  const campos = [
-    "fecha-reparacion",
-    "cambios-reparacion",
-    "observaciones-reparacion",
-    "tecnico-reparacion"
-  ];
-  campos.forEach(id => {
-    const campo = document.getElementById(id);
-    if (campo) campo.value = '';
-  });
+function cerrarModalAgregarHistorial() {
+    const modal = document.getElementById("modal-agregar-historial");
+    if (modal) modal.style.display = "none";
+
+    // Limpiar todos los campos
+    const campos = [
+        "fecha-reparacion",
+        "cambios-reparacion",
+        "observaciones-reparacion",
+        "tecnico-reparacion"
+    ];
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (campo) campo.value = '';
+    });
 }
 
 // ========== Agregar Reparación ==========
@@ -237,19 +313,27 @@ async function agregarReparacion() {
     const nueva = {};
     formData.forEach((value, key) => nueva[key] = value);
 
-    nueva.garantia = form.elements["garantia"].checked; // checkbox
+    nueva.garantia = form.elements["garantia"].checked;
+
+    // ✅ No transformamos fechaIngreso porque ya está en formato yyyy-mm-dd
+    // Solo validamos que esté presente
+    if (!nueva.fechaIngreso) {
+        alert("El campo Fecha de Ingreso es obligatorio.");
+        return;
+    }
 
     if (!nueva.codigo) {
         alert("El campo Código es obligatorio.");
         return;
     }
 
-    // ✅ Solo validamos ID
     const idExiste = reparaciones.some(r => r.id === nueva.id);
     if (idExiste) {
         alert("El ID ya está en uso. Por favor ingresa uno distinto.");
         return;
     }
+
+    console.log("🚨 Datos que se envían al servidor:", nueva);
 
     try {
         const response = await fetch('/api/reparaciones', {
@@ -271,7 +355,6 @@ async function agregarReparacion() {
 }
 
 
-
 // ========== Modificar Reparación ==========
 document.getElementById("form-modificar").addEventListener("submit", e => {
     e.preventDefault();
@@ -279,23 +362,27 @@ document.getElementById("form-modificar").addEventListener("submit", e => {
 });
 
 async function modificarReparacion() {
-    const i = obtenerIndiceSeleccionado();
-    if (i === -1) return;
-
-    const rep = reparaciones[i];
     const form = document.getElementById("form-modificar");
     const formData = new FormData(form);
     const actualizado = {};
     formData.forEach((v, k) => actualizado[k] = v);
     actualizado.garantia = form.elements["garantia"].checked;
 
+    // Usamos el código del formulario directamente
+    const codigo = form.elements["codigo"].value;
+
+    if (!codigo) {
+        alert("Código inválido. No se puede modificar.");
+        return;
+    }
 
     try {
-        const res = await fetch(`/api/reparaciones/${rep.codigo}`, {
+        const res = await fetch(`/api/reparaciones/${codigoOriginal}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(actualizado)
         });
+
         if (res.ok) {
             await cargarReparaciones();
             cerrarModalModificar();
@@ -304,7 +391,13 @@ async function modificarReparacion() {
         }
     } catch (err) {
         console.error("Error al modificar:", err);
+        alert("Ocurrió un error inesperado.");
     }
+}
+
+function cerrarModalModificar() {
+    const modal = document.getElementById("modal-modificar");
+    if (modal) modal.style.display = "none";
 }
 
 // ========== Eliminar Reparación ==========
@@ -335,11 +428,9 @@ async function eliminarReparacion() {
 async function buscarGlobal() {
     const consulta = document.getElementById("busqueda-global").value.toLowerCase();
 
-    // Buscar en vigentes
     const resVigentes = await fetch('/api/reparaciones');
     const vigentes = await resVigentes.json();
 
-    // Buscar en entregadas
     const resEntregadas = await fetch('/api/entregadas');
     const entregadas = await resEntregadas.json();
 
@@ -351,10 +442,11 @@ async function buscarGlobal() {
         Object.values(rep).some(val => String(val).toLowerCase().includes(consulta))
     );
 
-    renderizarBusqueda("reparaciones-tbody", resultadosVigentes);
-    renderizarBusqueda("entregadas-tbody", resultadosEntregadas);
+    renderizarTabla(resultadosVigentes);
+    renderizarEntregadas(resultadosEntregadas);
 }
 
+// Renderiza resultados de búsqueda y habilita funcionalidades completas
 function renderizarBusqueda(tbodyId, resultados) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
@@ -362,6 +454,11 @@ function renderizarBusqueda(tbodyId, resultados) {
     tbody.innerHTML = "";
     resultados.forEach(rep => {
         const row = document.createElement("tr");
+
+        // Index original para volver a encontrar la reparación luego
+        const realIndex = reparaciones.findIndex(r => r.codigo === rep.codigo);
+        row.setAttribute("data-index", realIndex);
+
         row.innerHTML = `
             <td>${formatearFecha(rep.fechaIngreso)}</td>
             <td>${rep.codigo}</td>
@@ -369,11 +466,33 @@ function renderizarBusqueda(tbodyId, resultados) {
             <td>${rep.modelo}</td>
             <td>${rep.cliente}</td>
             <td>${rep.id}</td>
-            <td>${rep.estado}</td>
+            <td>
+                <select class="estado-select" onchange="cambiarEstado('${rep.codigo}', this.value)">
+                    <option value="Ingreso" ${rep.estado === 'Ingreso' ? 'selected' : ''}>Ingreso</option>
+                    <option value="Esperando confirmacion" ${rep.estado === 'Esperando confirmacion' ? 'selected' : ''}>Esperando Confirmación</option>
+                    <option value="Esperando repuesto" ${rep.estado === 'Esperando repuesto' ? 'selected' : ''}>Esperando Repuesto</option>
+                    <option value="Salida" ${rep.estado === 'Salida' ? 'selected' : ''}>Salida</option>
+                </select>
+            </td>
+            <td><span class="semaforo ${obtenerColorEstado(rep.estado)}"></span></td>
+            <td><button class="btn-terminado" onclick="marcarTerminado('${rep.codigo}')">Terminado</button></td>
+            <td style="text-align: center;">${rep.garantia ? '✔️' : ''}</td>
         `;
+
+        row.addEventListener("click", function () {
+            tbody.querySelectorAll("tr").forEach(f => f.classList.remove("seleccionado"));
+            this.classList.add("seleccionado");
+            codigoActual = rep.codigo;  // ✅ Esto es clave
+            console.log("Seleccionaste:", codigoActual);
+        });
+
+
+        row.addEventListener("dblclick", () => visualizarReparacion());
+
         tbody.appendChild(row);
     });
 }
+
 
 // Mostrar menú en la posición del cursor
 
@@ -405,50 +524,74 @@ async function guardarHistorial() {
     const observaciones = document.getElementById("observaciones-reparacion").value.trim();
     const tecnico = document.getElementById("tecnico-reparacion").value.trim();
 
+    if (!codigoActual) {
+        alert("Selecciona una reparación antes de agregar historial.");
+        return;
+    }
+
     if (!fecha || !cambios || !observaciones || !tecnico) {
         alert("Debes completar todos los campos.");
         return;
     }
 
-    const nuevoRegistro = `[${fecha}] Técnico: ${tecnico}. Cambios: ${cambios}. Observaciones: ${observaciones}`;
-
     const idx = reparaciones.findIndex(r => r.codigo === codigoActual);
-    if (idx !== -1) {
-        reparaciones[idx].historial = (reparaciones[idx].historial || "") + `\n${nuevoRegistro}`;
+    if (idx === -1) {
+        alert("No se encontró la reparación seleccionada.");
+        return;
+    }
 
-        try {
-            const response = await fetch(`/api/reparaciones/${codigoActual}/historial`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ historial: reparaciones[idx].historial })
-            });
+    const garantia = reparaciones[idx].garantia || false;
 
-            if (!response.ok) throw new Error("Error al guardar en backend");
+    const nuevoRegistro = {
+        fecha,
+        tecnico,
+        garantia,
+        observaciones,
+        repuestos: cambios
+    };
 
-            // Actualizar campo en pantalla
-            document.getElementById("campo-historial").value = reparaciones[idx].historial;
+    if (!Array.isArray(reparaciones[idx].historial)) {
+        reparaciones[idx].historial = [];
+    }
 
-            // Limpiar campos
-            document.getElementById("fecha-reparacion").value = '';
-            document.getElementById("cambios-reparacion").value = '';
-            document.getElementById("observaciones-reparacion").value = '';
-            document.getElementById("tecnico-reparacion").value = '';
+    reparaciones[idx].historial.push(nuevoRegistro);
 
-            // Cerrar modal
-            cerrarModalAgregarHistorial();
-        } catch (error) {
-            console.error("Error al guardar historial en JSON:", error);
+    try {
+        const response = await fetch(`/api/reparaciones/${codigoActual}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reparaciones[idx])
+        });
+
+        if (!response.ok) throw new Error("Error al guardar historial.");
+
+        cerrarModalAgregarHistorial();
+        await cargarReparaciones();
+
+        // Reasignar codigoActual al objeto actualizado
+        const nuevoIdx = reparaciones.findIndex(r => r.codigo === codigoActual);
+        if (nuevoIdx !== -1) {
+            seleccionarFila(nuevoIdx);
+            visualizarReparacion(); // Mostrar modal actualizado automáticamente
         }
+
+        // Volver a visualizar el modal con los datos actualizados
+        setTimeout(() => {
+            visualizarReparacion();
+        }, 100);
+
+    } catch (error) {
+        console.error("Error al guardar historial:", error);
+        alert("No se pudo guardar el historial.");
     }
 }
 
-
-
-
-
-
-
-
-
-
+document.addEventListener("click", function (e) {
+    const tabla = document.getElementById("reparaciones-tbody");
+    const modalHistorial = document.getElementById("modal-historial");
+    if (!tabla) return;
+    if (!tabla.contains(e.target) && !modalHistorial.contains(e.target)) {
+        tabla.querySelectorAll("tr.seleccionado").forEach(tr => tr.classList.remove("seleccionado"));
+    }
+});
 

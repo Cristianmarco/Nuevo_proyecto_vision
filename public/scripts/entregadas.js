@@ -1,3 +1,4 @@
+let entregadas = [];
 document.addEventListener("DOMContentLoaded", () => {
     cargarEntregadas();
 });
@@ -5,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function cargarEntregadas() {
     try {
         const response = await fetch('/api/entregadas');
-        const entregadas = await response.json();
+        entregadas = await response.json();
         renderizarEntregadas(entregadas);
     } catch (error) {
         console.error("Error al cargar entregadas:", error);
@@ -18,145 +19,57 @@ function renderizarEntregadas(entregadas) {
 
     tbody.innerHTML = "";
 
+    // Ordenar por id (numérico, de menor a mayor)
+    entregadas.sort((a, b) => {
+        const idA = parseInt(String(a.id).match(/\d+/));
+        const idB = parseInt(String(b.id).match(/\d+/));
+        return idA - idB;
+    });
+
     entregadas.forEach(rep => {
+        // Formatear la fecha de entrega a dd/mm/yyyy
+        let fechaEntrega = "-";
+        if (rep.fechaEntrega) {
+            const fecha = new Date(rep.fechaEntrega);
+            const dia = String(fecha.getDate()).padStart(2, '0');
+            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            const anio = fecha.getFullYear();
+            fechaEntrega = `${dia}/${mes}/${anio}`;
+        }
+
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${rep.fechaIngreso}</td>
-            <td>${rep.codigo}</td>
-            <td>${rep.tipo}</td>
-            <td>${rep.modelo}</td>
-            <td>${rep.cliente}</td>
-            <td>${rep.tecnico}</td>
-            <td>${rep.id}</td>
-            <td>${rep.estado}</td>
-            <td>${rep.fechaEntrega || "-"}</td>
+            <td data-label="ID">${rep.id}</td>
+            <td data-label="Código">${rep.codigo}</td>
+            <td data-label="Tipo">${rep.tipo}</td>
+            <td data-label="Modelo">${rep.modelo}</td>
+            <td data-label="Cliente">${rep.cliente}</td>
+            <td data-label="Fecha de Entrega">${fechaEntrega}</td>
         `;
+        row.addEventListener("click", function () {
+            tbody.querySelectorAll("tr").forEach(f => f.classList.remove("selected"));
+            this.classList.add("selected");
+        });
+        
         tbody.appendChild(row);
     });
 }
 
-// Cargar reparaciones entregadas al iniciar
-document.addEventListener("DOMContentLoaded", () => {
-    cargarEntregadas();
-});
-
-// Función para cargar entregadas
-async function cargarEntregadas() {
-    try {
-        const response = await fetch('/api/entregadas');
-        const entregadas = await response.json();
-        renderizarEntregadas(entregadas);
-    } catch (error) {
-        console.error("Error al cargar entregadas:", error);
-    }
-}
-
-// Renderizar tabla de entregadas
-function renderizarEntregadas(entregadas) {
-    const tbody = document.getElementById("entregadas-tbody");
-    tbody.innerHTML = "";
-
-    entregadas.forEach(rep => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${rep.fechaIngreso}</td>
-            <td>${rep.codigo}</td>
-            <td>${rep.tipo}</td>
-            <td>${rep.modelo}</td>
-            <td>${rep.cliente}</td>
-            <td>${rep.tecnico}</td>
-            <td>${rep.id}</td>
-            <td>${rep.estado}</td>
-            <td>${rep.fechaEntrega || "-"}</td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
-// Función de búsqueda global
-function buscarGlobal() {
-    const termino = document.getElementById("busqueda-global").value.toLowerCase();
-
-    // Filtrar en la tabla de entregadas
-    const filas = document.querySelectorAll("#entregadas-tbody tr");
-    filas.forEach(fila => {
-        const texto = fila.textContent.toLowerCase();
-        fila.style.display = texto.includes(termino) ? "" : "none";
-    });
-}
-
+// Búsqueda global: SIEMPRE usa el renderizado principal
 async function buscarGlobal() {
     const consulta = document.getElementById("busqueda-global").value.toLowerCase();
 
-    // Buscar en vigentes
-    const resVigentes = await fetch('/api/reparaciones');
-    const vigentes = await resVigentes.json();
-
-    // Buscar en entregadas
     const resEntregadas = await fetch('/api/entregadas');
     const entregadas = await resEntregadas.json();
 
-    const resultadosVigentes = vigentes.filter(rep => Object.values(rep).some(val => val.toLowerCase().includes(consulta)));
-    const resultadosEntregadas = entregadas.filter(rep => Object.values(rep).some(val => val.toLowerCase().includes(consulta)));
+    const resultadosEntregadas = entregadas.filter(rep =>
+        Object.values(rep).some(val => String(val).toLowerCase().includes(consulta))
+    );
 
-    // Renderizar resultados en las tablas correspondientes
-    renderizarBusqueda("reparaciones-tbody", resultadosVigentes);
-    renderizarBusqueda("entregadas-tbody", resultadosEntregadas);
+    renderizarEntregadas(resultadosEntregadas);
 }
 
-function renderizarBusqueda(tbodyId, resultados) {
-    const tbody = document.getElementById(tbodyId);
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-    resultados.forEach(rep => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${rep.fechaIngreso || "-"}</td>
-            <td>${rep.codigo || "-"}</td>
-            <td>${rep.tipo || "-"}</td>
-            <td>${rep.modelo || "-"}</td>
-            <td>${rep.cliente || "-"}</td>
-            <td>${rep.tecnico || "-"}</td>
-            <td>${rep.id || "-"}</td>
-            <td>${rep.estado || "-"}</td>
-            ${rep.fechaEntrega ? `<td>${rep.fechaEntrega}</td>` : ""}
-        `;
-        tbody.appendChild(row);
-    });
-}
-function buscarGlobal() {
-    const query = document.getElementById('busqueda-global').value.toLowerCase();
-    const secciones = [
-        { id: "reparaciones-tbody", tipo: "vigentes" },
-        { id: "entregadas-tbody", tipo: "entregadas" }
-    ];
-
-    let totalEncontrados = 0;
-
-    secciones.forEach(sec => {
-        const tbody = document.getElementById(sec.id);
-        if (!tbody) return;
-
-        const filas = tbody.querySelectorAll("tr");
-        let encontrados = 0;
-
-        filas.forEach(fila => {
-            const textoFila = fila.innerText.toLowerCase();
-            if (textoFila.includes(query)) {
-                fila.style.display = "";
-                encontrados++;
-            } else {
-                fila.style.display = "none";
-            }
-        });
-
-        totalEncontrados += encontrados;
-    });
-
-    mostrarNotificacion(totalEncontrados);
-}
-
+// Notificación de búsqueda
 function mostrarNotificacion(resultados) {
     let notificacion = document.getElementById('notificacion-busqueda');
 
@@ -191,28 +104,92 @@ function mostrarNotificacion(resultados) {
     }, 2500);
 }
 
+function formatearFecha(fechaISO) {
+    if (!fechaISO) return "-";
+    const fecha = new Date(fechaISO);
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+}
+
+
+// Historial y modales
+
 let historialActual = '';
 let codigoActual = '';
 
 function visualizarHistorial(codigo) {
-    const rep = (reparaciones || entregadas).find(r => r.codigo === codigo);
-    if (!rep) return;
+    const rep = entregadas.find(r => r.codigo === codigo);
+    if (!rep) {
+        console.error("No se encontró la reparación con el código:", codigo);
+        alert("No se pudo encontrar la reparación.");
+        return;
+    }
 
-    historialActual = rep.historial || '';
-    codigoActual = codigo;
 
-    document.getElementById("historial-id").innerText = `ID: ${rep.id}`;
-    document.getElementById("historial-encabezado").innerText = `${rep.tipo} - ${rep.modelo} - ${rep.cliente}`;
-    document.getElementById("historial-texto").value = historialActual;
+
+    // Asigna el título y datos principales
+    document.getElementById("historial-titulo").textContent = `ID: ${rep.id}`;
+    document.getElementById("datos-equipo").innerHTML = `
+        <p><strong>Código:</strong> ${rep.codigo}</p>
+        <p><strong>Tipo:</strong> ${rep.tipo}</p>
+        <p><strong>Modelo:</strong> ${rep.modelo}</p>
+        <p><strong>Cliente:</strong> ${rep.cliente}</p>
+    `;
+
+    // Prepara historial (asegurate de tener array)
+    const historialData = Array.isArray(rep.historial) ? rep.historial : [];
+
+    const contenedor = document.getElementById("campo-historial");
+    contenedor.innerHTML = historialData.map(evento => `
+        <div class="historial-registro">
+            <table>
+                <tr>
+                    <td><strong>Fecha:</strong> ${formatearFecha(evento.fecha)}</td>
+                    <td><strong>Técnico:</strong> ${evento.tecnico}</td>
+                    <td><strong>Garantía:</strong> ${evento.garantia ? 'Sí' : 'No'}</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>Observaciones:</strong> ${evento.observaciones}</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>Repuestos:</strong> ${evento.repuestos}</td>
+                </tr>
+            </table>
+        </div>
+    `).join('');
 
     document.getElementById("modal-historial").style.display = "flex";
 }
+
+function visualizarHistorialEntregada() {
+    // Verificar que haya una fila seleccionada
+    const fila = document.querySelector("#entregadas-tbody tr.selected");
+    if (!fila) {
+        alert("Por favor, selecciona un equipo primero.");
+        return;
+    }
+
+    const codigo = fila.children[1].textContent.trim();
+    visualizarHistorial(codigo);
+}
+
+
 
 function cerrarModalHistorial() {
     document.getElementById("modal-historial").style.display = "none";
 }
 
 function abrirModalAgregarHistorial() {
+    const index = obtenerIndiceSeleccionado();
+    console.log("Índice seleccionado:", index, "codigoActual:", codigoActual);
+    if (index === -1) {
+        alert("Selecciona una reparación primero.");
+        return;
+    }
+    const rep = reparaciones[index];
+    codigoActual = rep.codigo;
     document.getElementById("modal-agregar-historial").style.display = "flex";
 }
 
@@ -226,8 +203,7 @@ function guardarHistorial() {
 
     historialActual += `\n[${new Date().toLocaleDateString()}] ${nuevoRegistro}`;
 
-    // Actualizar en la fuente de datos (reparaciones o entregadas)
-    const dataset = (reparaciones || entregadas);
+    const dataset = (typeof entregadas !== "undefined" ? entregadas : []);
     const idx = dataset.findIndex(r => r.codigo === codigoActual);
     if (idx !== -1) {
         dataset[idx].historial = historialActual;
@@ -236,5 +212,69 @@ function guardarHistorial() {
     // Recargar visualización
     document.getElementById("historial-texto").value = historialActual;
     cerrarModalAgregarHistorial();
+}
+
+// Deseleccionar fila al hacer click fuera de la tabla
+document.addEventListener("click", function (e) {
+    const tabla = document.getElementById("entregadas-tbody");
+    if (!tabla) return;
+    if (!tabla.contains(e.target)) {
+        tabla.querySelectorAll("tr.selected").forEach(tr => tr.classList.remove("selected"));
+    }
+});
+
+async function recargarEquipoEntregado() {
+  const fila = document.querySelector("#entregadas-tbody tr.selected");
+  if (!fila) {
+    alert("Por favor, selecciona un equipo primero.");
+    return;
+  }
+
+  const codigo = fila.children[1].textContent.trim();
+
+  // Traemos la reparación seleccionada
+  const rep = entregadas.find(r => r.codigo === codigo);
+  if (!rep) {
+    alert("No se encontró la reparación seleccionada.");
+    return;
+  }
+
+  // Actualizar la fecha de ingreso al día de hoy (formato yyyy-mm-dd)
+  const hoy = new Date();
+  rep.fechaIngreso = hoy.toISOString().split("T")[0];
+  rep.estado = "Ingreso";
+
+  try {
+    // Guardar en reparaciones vigentes
+    const response = await fetch('/api/reparaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rep)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      alert(error.error || 'Error al recargar la reparación.');
+      return;
+    }
+
+    // Eliminar de entregadas
+    const delResponse = await fetch(`/api/entregadas/${codigo}`, {
+      method: 'DELETE'
+    });
+
+    if (!delResponse.ok) {
+      const error = await delResponse.json();
+      alert(error.error || 'Error al eliminar reparación de entregadas.');
+      return;
+    }
+
+    alert("Reparación recargada a vigentes con éxito.");
+    cargarEntregadas();  // Refrescar tabla de entregadas
+
+  } catch (error) {
+    console.error("Error al recargar equipo:", error);
+    alert("Error al recargar equipo.");
+  }
 }
 

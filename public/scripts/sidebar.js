@@ -10,3 +10,22 @@ function toggleSubmenu() {
     icon.classList.add('rotate');
   }
 }
+
+function irA(seccion) {
+  switch (seccion) {
+    case 'main':
+      window.location.href = '/main';
+      break;
+    case 'clientes':
+      window.location.href = '/clientes';
+      break;
+    case 'reparaciones-vigentes':
+      window.location.href = '/reparaciones-vigentes';
+      break;
+    case 'historial':
+      window.location.href = '/historial';
+      break;
+    default:
+      console.warn('Sección no reconocida:', seccion);
+  }
+}

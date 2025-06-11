@@ -1,16 +1,30 @@
-function irAClientes() {
-  window.location.href = '/externos-clientes';
-}
-
 function mostrarSubmenuReparaciones() {
-  document.getElementById("seccion-principal").style.display = "none";
-  document.getElementById("submenu-reparaciones").style.display = "flex";
+  const seccionPrincipal = document.getElementById("seccion-principal");
+  const submenuReparaciones = document.getElementById("submenu-reparaciones");
+
+  if (seccionPrincipal && submenuReparaciones) {
+    seccionPrincipal.style.display = "none";
+    submenuReparaciones.style.display = "flex";
+  } else {
+    console.warn("⚠️ Alguno de los elementos no se encontró en el DOM");
+  }
 }
 
 function volverASeccionPrincipal() {
-  document.getElementById("submenu-reparaciones").style.display = "none";
+  const submenuReparaciones = document.getElementById("submenu-reparaciones");
   const principal = document.getElementById("seccion-principal");
-  principal.style.display = "flex";
-  principal.style.flexDirection = "row"; // Asegura que las fichas vuelvan a estar en línea
-  principal.style.gap = "20px";
+
+  if (submenuReparaciones && principal) {
+    submenuReparaciones.style.display = "none";
+    principal.style.display = "flex";
+    principal.style.flexDirection = "row";
+    principal.style.gap = "20px";
+  } else {
+    console.warn("⚠️ Alguno de los elementos no se encontró en el DOM");
+  }
 }
+
+function irAClientes() {
+  window.location.href = '/clientes';
+}
+

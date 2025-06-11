@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/css/botones.css" />
   <link rel="stylesheet" href="/css/animaciones.css" />
   <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/main.css" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
@@ -21,59 +22,54 @@
   <!-- HEADER -->
   <header class="main-header">
     <div class="logo">
-      <img src="/logo.png" alt="Logo Empresa" height="40" />
+      <img src="/images/logo.png" alt="Logo Empresa" height="40" class="logo-header" />
     </div>
     <div class="user-info">
       <i class="fas fa-user-circle"></i>
-      <span>Bienvenido, Usuario</span>
+      <span id="user-name">Bienvenido, Usuario</span>
       <button class="logout-button" onclick="logout()">Salir</button>
     </div>
   </header>
-
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <nav>
       <ul>
-        <li><a href="/main"><i class="fas fa-home"></i> Inicio</a></li>
-        <li>
-          <a href="javascript:void(0);" onclick="toggleSubmenu()">
-            <i class="fas fa-users"></i> Clientes
-            <i class="fas fa-chevron-down submenu-icon" id="submenu-icon"></i>
-          </a>
-          <ul class="submenu" id="clientes-submenu" style="display: none;">
-            <li><a href="/dota"><i class="fas fa-user-tie"></i> Dota</a></li>
-            <li><a href="/externos"><i class="fas fa-user-friends"></i> Externos</a></li>
-          </ul>
+        <li><button class="sidebar-btn" onclick="irA('externos')"><i class="fas fa-user-friends"></i> EXTERNOS</button>
         </li>
-        <li><a href="/reparaciones-vigentes"><i class="fas fa-tools"></i> Stock</a></li>
-        <li><a href="/reparaciones-entregadas"><i class="fas fa-check-circle"></i> Entregadas</a></li>
-        <li><a href="#"><i class="fas fa-chart-line"></i> Reportes</a></li>
+        <li><button class="sidebar-btn" onclick="irA('dota')"><i class="fas fa-user-tie"></i> DOTA</button></li>
+        <hr>
+        <li><a href="/reportes"><i class="fas fa-chart-line"></i> Reportes</a></li>
+        <li><a href="/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
+        <li><a href="/configuracion"><i class="fas fa-cog"></i> Configuración</a></li>
       </ul>
     </nav>
   </aside>
 
-  <script>
-    function toggleSubmenu() {
-      const submenu = document.getElementById('clientes-submenu');
-      submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
-    }
 
-    // Mostrar automáticamente el submenú si estamos en clientes
-    document.addEventListener('DOMContentLoaded', () => {
-      const path = window.location.pathname;
-      if (path.includes('externos') || path.includes('dota')) {
-        document.getElementById('clientes-submenu').style.display = 'flex';
-      } else {
-        document.getElementById('clientes-submenu').style.display = 'none';
-      }
-    });
-  </script>
-
-
+  <!-- CONTENIDO PRINCIPAL -->
   <main class="content">
-    <h1>Dashboard Principal</h1>
-    <p>Selecciona una opción del menú lateral para empezar.</p>
+
+    <div class="logo-animado-container">
+      <h1 class="bienvenida-texto">¡Bienvenido!</h1>
+      <object type="image/svg+xml" data="/images/image2vector.svg" class="logo-animado"></object>
+    </div>
+
+
+    <section class="logo-container">
+      <svg id="logo-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+        <!-- Texto AMORIM -->
+        <text id="logo-text" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle">
+          AMORIM
+        </text>
+        <!-- Círculo -->
+        <path id="logo-circle" d="M 120 100 a 60 60 0 1 1 0.1 0" />
+        <!-- Subrayado -->
+        <path id="logo-line" d="M 100 150 Q 200 180 300 150" />
+      </svg>
+    </section>
+
+
     <section class="dashboard-cards">
       <div class="card">
         <div class="card-icon"><i class="fas fa-users"></i></div>
@@ -97,21 +93,17 @@
         </div>
       </div>
     </section>
-
   </main>
-  </div>
 
-  <script>
-    function logout() {
-      if (confirm('¿Seguro que deseas salir?')) {
-        window.location.href = '/';
-      }
-    }
-  </script>
+  <!-- SCRIPTS -->
+  <script src="/scripts/main.js"></script>
   <script src="/scripts/sidebar.js"></script>
   <script src="/scripts/logout.js"></script>
   <script src="/scripts/abm_clientes.js"></script>
   <script src="/scripts/dashboard.js"></script>
+  <script src="/scripts/main.js"></script>
+
+
 
 </body>
 

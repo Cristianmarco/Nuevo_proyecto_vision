@@ -25,7 +25,12 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   text-align: left;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;  /* 🔥 esto bloquea el scroll horizontal */
+  box-sizing: border-box; /* 🛠️ corrige el padding dentro del ancho */
 }
+
 
 .cerrar {
   position: absolute;
@@ -84,18 +89,18 @@
   padding: 8px;
   background-color: #f9f9f9;
   border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 #campo-historial {
-    width: 100%;
-    height: 200px;
-    resize: none;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    background-color: #f9f9f9;
+  width: 100%;
+  height: 200px;
+  resize: none;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #f9f9f9;
 }
 
 .form-grid {
@@ -236,7 +241,8 @@
 }
 
 #modal-agregar-historial .modal-contenido {
-  padding-top: 60px; /* deja espacio para el botón cerrar */
+  padding-top: 60px;
+  /* deja espacio para el botón cerrar */
   position: relative;
 }
 
@@ -284,7 +290,35 @@
   color: #e63946;
 }
 
+.historial-textarea {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 15px;
+}
 
+.historial-registro {
+  margin-bottom: 15px;
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
+.historial-registro table {
+  width: 100%;
+  font-size: 14px;
+  border-collapse: collapse;
+}
 
+.historial-registro td {
+  padding: 4px 6px;
+  vertical-align: top;
+}
 
+input[readonly] {
+  background-color: #eee;
+  cursor: not-allowed;
+}

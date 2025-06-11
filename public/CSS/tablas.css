@@ -109,6 +109,26 @@ tr.seleccionado {
     }
 }
 
+@media (max-width: 1024px) {
+    .tabla-clientes, .tabla-reparaciones {
+        font-size: 13px;
+    }
+    .tabla-clientes th, .tabla-clientes td,
+    .tabla-reparaciones th, .tabla-reparaciones td {
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 900px) {
+    .tabla-clientes, .tabla-reparaciones {
+        font-size: 12px;
+    }
+    .tabla-clientes th, .tabla-clientes td,
+    .tabla-reparaciones th, .tabla-reparaciones td {
+        padding: 6px 6px;
+    }
+}
+
 /* ======= SEMÁFORO ======= */
 .semaforo {
     display: inline-block;
@@ -315,3 +335,149 @@ tr.seleccionado {
   accent-color: #4da6ff; /* color azul clarito */
   cursor: pointer;
 }
+
+/* Alerta visual moderada para reparaciones con más de 15 días */
+tr.alerta-moderada {
+  background-color: rgba(255, 204, 0, 0.15); /* suave amarillo */
+}
+
+/* Alerta crítica para más de 21 días */
+tr.alerta-fecha {
+  background-color: rgba(255, 0, 0, 0.1); /* leve rojo */
+}
+
+#entregadas-tbody tr.selected {
+    background-color: #d1ffd1 !important;
+}
+
+/* ======= GENERAL ======= */
+body.usuarios-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f8;
+  margin: 0;
+  color: #333;
+  padding: 20px;
+}
+
+.usuarios-page h1, .usuarios-page h2 {
+  text-align: center;
+  color: #333;
+}
+
+/* ======= BOTONES ======= */
+.usuarios-page button {
+  background-color: #36514f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.usuarios-page button:hover {
+  background-color: #2d4246;
+  transform: scale(1.05);
+}
+
+/* ======= TABLA USUARIOS ======= */
+.usuarios-page .tabla-usuarios {
+  width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.usuarios-page .tabla-usuarios thead {
+  background: linear-gradient(to right, #4da6ff, #1a73e8);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.usuarios-page .tabla-usuarios th,
+.usuarios-page .tabla-usuarios td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #dddddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usuarios-page .tabla-usuarios tbody tr:hover {
+  background-color: #f5faff;
+  cursor: pointer;
+}
+
+/* ======= FORMULARIO NUEVO USUARIO ======= */
+.usuarios-page #formulario-nuevo {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.usuarios-page #formulario-nuevo h2 {
+  margin-top: 0;
+  color: #36514f;
+}
+
+.usuarios-page #formulario-nuevo input,
+.usuarios-page #formulario-nuevo select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.usuarios-page #formulario-nuevo button {
+  width: 100%;
+}
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 768px) {
+  .usuarios-page .tabla-usuarios {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .usuarios-page .tabla-usuarios thead {
+    display: none;
+  }
+
+  .usuarios-page .tabla-usuarios tr {
+    display: block;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+  }
+
+  .usuarios-page .tabla-usuarios td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .usuarios-page .tabla-usuarios td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #555;
+  }
+}
+
+

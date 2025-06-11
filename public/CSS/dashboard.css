@@ -119,20 +119,32 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-.submenu-reparaciones {
-  display: none;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  animation: fadeIn 0.5s ease-in-out;
-}
-
 .submenu-reparaciones.mostrar {
   display: flex !important;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+#logo-svg {
+  width: 100%;
+  height: auto;
+}
+
+#logo-text {
+  font-size: 48px;
+  font-weight: bold;
+  fill: #0f0; /* Verde Neon */
+  opacity: 0;
+  font-family: Arial, sans-serif;
+  transition: opacity 1s ease;
+}
+
+#logo-circle,
+#logo-line {
+  fill: none;
+  stroke: #0f0;
+  stroke-width: 4;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  opacity: 0;
+  transition: stroke-dashoffset 2s ease, opacity 0.5s ease;
 }
 

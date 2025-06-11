@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Usuarios</title>
+
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/tablas.css" />
+  <link rel="stylesheet" href="/css/usuarios.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body class="main-dashboard">
+
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="logo">
+      <img src="/images/logo.png" alt="Logo Empresa" height="40" class="logo-header" />
+    </div>
+    <div class="user-info">
+      <i class="fas fa-user-circle"></i>
+      <span id="user-name">Bienvenido, Usuario</span>
+      <button class="logout-button" onclick="logout()">Salir</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav>
+      <ul>
+        <li><button class="sidebar-btn" onclick="irA('externos')"><i class="fas fa-user-friends"></i> EXTERNOS</button></li>
+        <li><button class="sidebar-btn" onclick="irA('dota')"><i class="fas fa-user-tie"></i> DOTA</button></li>
+        <hr>
+        <li><a href="/reportes"><i class="fas fa-chart-line"></i> Reportes</a></li>
+        <li><a href="/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
+        <li><a href="/configuracion"><i class="fas fa-cog"></i> Configuración</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="content">
+    <section class="usuarios-section">
+      <h2>Gestión de Usuarios</h2>
+      <button onclick="mostrarFormularioNuevoUsuario()" class="btn-guardar">Nuevo Usuario</button>
+
+      <table id="tabla-usuarios" class="tabla-usuarios">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="formulario-nuevo" style="display: none;">
+        <h3>Agregar/Editar Usuario</h3>
+        <form id="usuarioForm">
+          <input type="email" id="email" placeholder="Email" required>
+          <input type="password" id="password" placeholder="Contraseña">
+          <select id="rol">
+            <option value="admin">Admin</option>
+            <option value="cliente">Cliente</option>
+          </select>
+          <button type="submit" class="btn-guardar">Guardar</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="/scripts/usuarios.js"></script>
+  <script src="/scripts/sidebar.js"></script>
+  <script src="/scripts/logout.js"></script>
+  <script>
+    function logout() {
+      if (confirm('¿Seguro que deseas salir?')) {
+        window.location.href = '/';
+      }
+    }
+
+    function irA(seccion) {
+      switch (seccion) {
+        case 'externos':
+          window.location.href = '/externos';
+          break;
+        case 'dota':
+          window.location.href = '/dota';
+          break;
+        case 'usuarios':
+          window.location.href = '/usuarios';
+          break;
+        case 'reportes':
+          window.location.href = '/reportes';
+          break;
+        case 'configuracion':
+          window.location.href = '/configuracion';
+          break;
+        default:
+          console.warn('Sección no reconocida:', seccion);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const username = localStorage.getItem('username');
+      if (username) {
+        document.getElementById('user-name').textContent = `Bienvenido, ${username}`;
+      }
+    });
+  </script>
+</body>
+</html>

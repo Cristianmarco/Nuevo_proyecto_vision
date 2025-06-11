@@ -107,4 +107,28 @@
   padding-bottom: 140px; /* para no tapar la tabla */
 }
 
+/* BOTÓN SIDEBAR */
+.sidebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  background: linear-gradient(to right, #4da6ff, #1a73e8);
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  padding: 12px 20px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.3s ease;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.sidebar-btn:hover {
+  background: linear-gradient(to right, #1a73e8, #4da6ff);
+}
+
+
+
 

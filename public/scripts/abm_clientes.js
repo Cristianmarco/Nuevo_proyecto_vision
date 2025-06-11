@@ -19,28 +19,45 @@ function renderizarClientes(clientes = []) {
 
     tbody.innerHTML = "";
 
+    clientes.sort((a, b) => {
+        // Convertir a cadena y comparar alfabéticamente
+        // Pero si ambos son numéricos, comparar como números
+        const aCodigo = a.codigo.trim();
+        const bCodigo = b.codigo.trim();
+
+        const aNum = parseInt(aCodigo);
+        const bNum = parseInt(bCodigo);
+
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return aNum - bNum;
+        } else {
+            return aCodigo.localeCompare(bCodigo, 'es', { sensitivity: 'base', numeric: true });
+        }
+    });
+
+
     clientes.forEach((cliente, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${cliente.codigo}</td>
-            <td>${cliente.razonSocial}</td>
-            <td>${cliente.fantasia}</td>
-            <td>${cliente.domicilio}</td>
-            <td>${cliente.localidad}</td>
-            <td>${cliente.provincia}</td>
-            <td>${cliente.telefono}</td>
-            <td>${cliente.mail}</td>
-            <td>${cliente.documento}</td>
+            <td data-label="Código">${cliente.codigo}</td>
+            <td data-label="Razón Social">${cliente.razonSocial}</td>
+            <td data-label="Nombre de Fantasía">${cliente.fantasia}</td>
+            <td data-label="Domicilio">${cliente.domicilio}</td>
+            <td data-label="Localidad">${cliente.localidad}</td>
+            <td data-label="Provincia">${cliente.provincia}</td>
+            <td data-label="Teléfono">${cliente.telefono}</td>
+            <td data-label="Mail">${cliente.mail}</td>
+            <td data-label="DNI/CUIT">${cliente.documento}</td>
         `;
 
         row.addEventListener("click", () => seleccionarFila(index, "clientes-tbody"));
-        
+
         tbody.appendChild(row);
     });
 }
 
-function seleccionarFila(index, tablaId) {
-    const filas = document.querySelectorAll(`#${tablaId} tr`);
+function seleccionarFila(index, tbodyId = "clientes-tbody") {
+    const filas = document.querySelectorAll(`#${tbodyId} tr`);
     filas.forEach(f => f.classList.remove("seleccionado"));
     filas[index].classList.add("seleccionado");
 }
@@ -75,6 +92,16 @@ async function agregarCliente() {
     const nuevoCliente = {};
     formData.forEach((value, key) => nuevoCliente[key] = value);
 
+    // Validar código duplicado (del lado del cliente)
+    const clientesExistentes = document.querySelectorAll("#clientes-tbody tr");
+    for (const row of clientesExistentes) {
+        const codigoExistente = row.children[0].innerText.trim();
+        if (codigoExistente === nuevoCliente.codigo.trim()) {
+            alert(`El código ${nuevoCliente.codigo} ya existe. Por favor ingresa uno diferente.`);
+            return;
+        }
+    }
+
     try {
         const response = await fetch('/api/clientes', {
             method: 'POST',
@@ -95,6 +122,7 @@ async function agregarCliente() {
         console.error('Error al agregar cliente:', error);
     }
 }
+
 
 async function modificarCliente() {
     const cliente = obtenerClienteSeleccionado();
