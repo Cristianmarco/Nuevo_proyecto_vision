@@ -3,51 +3,44 @@
 // Cargar Clientes al iniciar la página
 document.addEventListener('DOMContentLoaded', cargarClientes);
 
+document.addEventListener('DOMContentLoaded', () => {
+  const rol = localStorage.getItem('rol');
+  if (rol && rol.toLowerCase() === 'cliente' && !window.location.pathname.includes('reparaciones-vigentes')) {
+    window.location.href = '/reparaciones-vigentes';
+  }
+});
+
+
 async function cargarClientes() {
     try {
         const response = await fetch('/api/clientes');
         const clientes = await response.json();
+        console.log("CLIENTES DESDE API:", clientes); // <-- ACA
         renderizarClientes(clientes);
     } catch (error) {
         console.error('Error al cargar clientes:', error);
     }
 }
 
+
 function renderizarClientes(clientes = []) {
     const tbody = document.getElementById("clientes-tbody");
-    if (!tbody) return; // Si no existe la tabla, no intentes modificarla
+    if (!tbody) return;
 
     tbody.innerHTML = "";
-
-    clientes.sort((a, b) => {
-        // Convertir a cadena y comparar alfabéticamente
-        // Pero si ambos son numéricos, comparar como números
-        const aCodigo = a.codigo.trim();
-        const bCodigo = b.codigo.trim();
-
-        const aNum = parseInt(aCodigo);
-        const bNum = parseInt(bCodigo);
-
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-            return aNum - bNum;
-        } else {
-            return aCodigo.localeCompare(bCodigo, 'es', { sensitivity: 'base', numeric: true });
-        }
-    });
-
 
     clientes.forEach((cliente, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td data-label="Código">${cliente.codigo}</td>
-            <td data-label="Razón Social">${cliente.razonSocial}</td>
-            <td data-label="Nombre de Fantasía">${cliente.fantasia}</td>
-            <td data-label="Domicilio">${cliente.domicilio}</td>
-            <td data-label="Localidad">${cliente.localidad}</td>
-            <td data-label="Provincia">${cliente.provincia}</td>
-            <td data-label="Teléfono">${cliente.telefono}</td>
-            <td data-label="Mail">${cliente.mail}</td>
-            <td data-label="DNI/CUIT">${cliente.documento}</td>
+            <td data-label="Código">${cliente.codigo || ''}</td>
+            <td data-label="Razón Social">${cliente.razonSocial || ''}</td>
+            <td data-label="Nombre de Fantasía">${cliente.fantasia || ''}</td>
+            <td data-label="Domicilio">${cliente.domicilio || ''}</td>
+            <td data-label="Localidad">${cliente.localidad || ''}</td>
+            <td data-label="Provincia">${cliente.provincia || ''}</td>
+            <td data-label="Teléfono">${cliente.telefono || ''}</td>
+            <td data-label="Mail">${cliente.mail || ''}</td>
+            <td data-label="DNI/CUIT">${cliente.documento || ''}</td>
         `;
 
         row.addEventListener("click", () => seleccionarFila(index, "clientes-tbody"));
@@ -55,6 +48,7 @@ function renderizarClientes(clientes = []) {
         tbody.appendChild(row);
     });
 }
+
 
 function seleccionarFila(index, tbodyId = "clientes-tbody") {
     const filas = document.querySelectorAll(`#${tbodyId} tr`);

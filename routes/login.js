@@ -1,11 +1,11 @@
-/// routes/login.js
+// routes/login.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
-const usuariosPath = path.join(__dirname, '../data/usuarios.json'); // Ajustar según ruta real
+const usuariosPath = path.join(__dirname, '../data/usuarios.json');
 
 // POST /api/login
 router.post('/', async (req, res) => {
@@ -37,18 +37,22 @@ router.post('/', async (req, res) => {
     return res.status(401).json({ error: 'Contraseña incorrecta.' });
   }
 
-  // Guardar usuario y rol en la sesión
-  req.session.user = usuario.email;
-  req.session.role = usuario.rol;
+  // Guardar usuario, rol y cliente en la sesión (opcional)
+  if (req.session) {
+    req.session.user = usuario.email;
+    req.session.rol = usuario.rol;
+    if (usuario.cliente) {
+      req.session.cliente = usuario.cliente;
+    }
+  }
 
-  // Logs para depuración
-  console.log(`🟢 Usuario ${usuario.email} logueado como ${usuario.rol}`);
-  console.log(`Email recibido: ${email}`);
-  console.log(`Password recibido: ${password}`);
-  console.log(`Password guardado: ${usuario.password}`);
-
-  // Respuesta
-  res.status(200).json({ message: 'Login exitoso', rol: usuario.rol });
+  // Responder SIEMPRE con los 3 campos, para que el frontend sea consistente
+  res.status(200).json({
+    message: 'Login exitoso',
+    email: usuario.email,
+    rol: usuario.rol,
+    cliente: usuario.cliente || null   // puede ser null si es admin
+  });
 });
 
 module.exports = router;

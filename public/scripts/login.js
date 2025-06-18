@@ -17,17 +17,21 @@ async function loginUser(event) {
       body: JSON.stringify({ email, password })
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      showError(errorData.mensaje);
+      showError(data.error || data.mensaje || "Error al iniciar sesión");
       return;
     }
 
-    const data = await response.json();
-    console.log("Login exitoso:", data);
-
-    // Guardar el rol en localStorage
-    localStorage.setItem('userRole', data.role);
+    // Guardar datos en localStorage
+    localStorage.setItem('rol', data.rol);
+    localStorage.setItem('username', data.email);
+    if (data.cliente) {
+      localStorage.setItem('cliente', data.cliente);
+    } else {
+      localStorage.removeItem('cliente');
+    }
 
     // Redirigir al main
     window.location.href = '/main';
@@ -60,3 +64,4 @@ function togglePasswordVisibility() {
     icon.classList.add('fa-eye');
   }
 }
+

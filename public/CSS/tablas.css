@@ -480,4 +480,26 @@ body.usuarios-page {
   }
 }
 
+.tr-alerta-tiempo {
+  background: linear-gradient(90deg, #ffe0e0 55%, #fff5f5 100%) !important;
+  color: #b12323 !important;
+  box-shadow: 0 2px 8px 0 rgba(190, 40, 40, 0.12);
+  font-weight: 500;
+}
+
+#reparaciones-tbody tr.seleccionado {
+  background: linear-gradient(90deg, #d6f1fd 80%, #f7f7f7 100%) !important;
+  color: #12425a !important;
+  font-weight: bold;
+  box-shadow: 0 2px 10px 0 rgba(23,79,134, 0.11);
+}
+
+#reparaciones-tbody tr {
+  transition: background 0.3s, color 0.3s;
+}
+
+
+
+
+
 

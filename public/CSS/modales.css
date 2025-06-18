@@ -322,3 +322,44 @@ input[readonly] {
   background-color: #eee;
   cursor: not-allowed;
 }
+
+/* === MODAL USUARIOS === */
+#formulario-usuario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#formulario-usuario input,
+#formulario-usuario select {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+  transition: border-color 0.2s ease;
+}
+
+#formulario-usuario input:focus,
+#formulario-usuario select:focus {
+  border-color: #1a73e8;
+  outline: none;
+  background-color: #fff;
+}
+
+#formulario-usuario .btn-guardar {
+  background-color: #00cc66;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#formulario-usuario .btn-guardar:hover {
+  background-color: #00a653;
+}

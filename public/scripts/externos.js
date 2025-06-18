@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const rol = localStorage.getItem('rol');
+  if (rol && rol.toLowerCase() === 'cliente' && !window.location.pathname.includes('reparaciones-vigentes')) {
+    window.location.href = '/reparaciones-vigentes';
+  }
+});
+
+
 function mostrarSubmenuReparaciones() {
   const seccionPrincipal = document.getElementById("seccion-principal");
   const submenuReparaciones = document.getElementById("submenu-reparaciones");

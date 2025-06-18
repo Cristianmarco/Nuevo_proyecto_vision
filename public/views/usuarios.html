@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +10,8 @@
   <link rel="stylesheet" href="/css/tablas.css" />
   <link rel="stylesheet" href="/css/usuarios.css" />
   <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/botones.css" />
+  <link rel="stylesheet" href="/css/modales.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
@@ -30,8 +33,13 @@
   <aside class="sidebar">
     <nav>
       <ul>
-        <li><button class="sidebar-btn" onclick="irA('externos')"><i class="fas fa-user-friends"></i> EXTERNOS</button></li>
-        <li><button class="sidebar-btn" onclick="irA('dota')"><i class="fas fa-user-tie"></i> DOTA</button></li>
+        <li><button class="sidebar-btn" onclick="irA('main')"><i class="fas fa-home"></i> Inicio</button></li>
+        <li><button class="sidebar-btn" onclick="irA('clientes')"><i class="fas fa-users"></i> Clientes</button></li>
+        <li><button class="sidebar-btn" onclick="irA('reparaciones-vigentes')"><i class="fas fa-tools"></i>
+            R. Vigentes</button></li>
+        <li><button class="sidebar-btn" onclick="irA('historial')">
+            <i class="fas fa-history"></i> Historial
+          </button></li>
         <hr>
         <li><a href="/reportes"><i class="fas fa-chart-line"></i> Reportes</a></li>
         <li><a href="/usuarios"><i class="fas fa-users"></i> Usuarios</a></li>
@@ -42,34 +50,74 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="content">
-    <section class="usuarios-section">
-      <h2>Gestión de Usuarios</h2>
-      <button onclick="mostrarFormularioNuevoUsuario()" class="btn-guardar">Nuevo Usuario</button>
-
-      <table id="tabla-usuarios" class="tabla-usuarios">
+    <section class="table-section">
+      <table class="tabla-reparaciones tabla-estandar" id="tabla-usuarios">
         <thead>
           <tr>
             <th>Email</th>
             <th>Rol</th>
-            <th>Acciones</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="usuarios-tbody">
+          <!-- Se llena con JS -->
+        </tbody>
       </table>
+    </section>
 
-      <div id="formulario-nuevo" style="display: none;">
-        <h3>Agregar/Editar Usuario</h3>
-        <form id="usuarioForm">
-          <input type="email" id="email" placeholder="Email" required>
-          <input type="password" id="password" placeholder="Contraseña">
-          <select id="rol">
+    <!-- Panel flotante de acciones -->
+    <section class="acciones-reparaciones fixed-actions">
+      <button class="icon-button agregar" onclick="abrirModalAgregarUsuario()">
+        <i class="fas fa-plus"></i>
+      </button>
+      <button class="icon-button modificar" onclick="abrirModalModificarUsuario()">
+        <i class="fas fa-pen"></i>
+      </button>
+      <button class="icon-button eliminar" onclick="eliminarUsuario()">
+        <i class="fas fa-trash"></i>
+      </button>
+    </section>
+
+    <!-- MODAL AGREGAR USUARIO -->
+    <div id="modal-agregar-usuario" class="modal">
+      <div class="modal-contenido">
+        <span class="cerrar" onclick="cerrarModalAgregarUsuario()">&times;</span>
+        <h2>Agregar Usuario</h2>
+        <form id="form-agregar-usuario">
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="password" placeholder="Contraseña" required />
+          <select name="rol" id="rol-agregar" required onchange="toggleClienteSelect(this.value)">
             <option value="admin">Admin</option>
             <option value="cliente">Cliente</option>
           </select>
+          <!-- Contenedor para el select de cliente, lo completa el JS -->
+          <div id="select-cliente-agregar" style="display:none; margin-top:10px"></div>
           <button type="submit" class="btn-guardar">Guardar</button>
         </form>
       </div>
-    </section>
+    </div>
+
+
+    <!-- MODAL MODIFICAR USUARIO -->
+    <div id="modal-modificar-usuario" class="modal">
+      <div class="modal-contenido">
+        <span class="cerrar" onclick="cerrarModalModificarUsuario()">&times;</span>
+        <h2>Modificar Usuario</h2>
+        <form id="form-modificar-usuario">
+          <input type="email" name="email" placeholder="Email" readonly />
+          <input type="password" name="password" placeholder="Nueva Contraseña" />
+          <select name="rol" id="rol-modificar" required onchange="toggleClienteSelectEdit(this.value)">
+            <option value="admin">Admin</option>
+            <option value="cliente">Cliente</option>
+          </select>
+          <!-- Contenedor para el select de cliente, lo completa el JS -->
+          <div id="select-cliente-modificar" style="display:none; margin-top:10px"></div>
+          <button type="submit" class="btn-guardar">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+
+
+
   </main>
 
   <!-- SCRIPTS -->
@@ -85,6 +133,18 @@
 
     function irA(seccion) {
       switch (seccion) {
+        case 'main':
+          window.location.href = '/main';
+          break;
+        case 'clientes':
+          window.location.href = '/clientes';
+          break;
+        case 'reparaciones-vigentes':
+          window.location.href = '/reparaciones-vigentes';
+          break;
+        case 'historial':
+          window.location.href = '/historial';
+          break;
         case 'externos':
           window.location.href = '/externos';
           break;
@@ -105,6 +165,7 @@
       }
     }
 
+
     document.addEventListener('DOMContentLoaded', () => {
       const username = localStorage.getItem('username');
       if (username) {
@@ -113,4 +174,5 @@
     });
   </script>
 </body>
+
 </html>

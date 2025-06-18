@@ -1,3 +1,4 @@
+// routes/reparaciones.js
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -7,16 +8,36 @@ const router = express.Router();
 const reparacionesPath = path.join(__dirname, '..', 'reparaciones.json');
 if (!fs.existsSync(reparacionesPath)) fs.writeFileSync(reparacionesPath, '[]', 'utf-8');
 
+// Helper para leer headers
+function getUserInfo(req) {
+  return {
+    rol: (req.headers['x-role'] || '').toLowerCase(),
+    email: req.headers['x-user'] || '',
+    cliente: req.headers['x-cliente'] || '', // opcional, según implementación
+  };
+}
+
 // ========== GET ==========
 router.get('/', (req, res, next) => {
-  const cliente = req.query.cliente; // filtro opcional
+  const { rol, email, cliente } = getUserInfo(req);
+  let clienteFiltro = req.query.cliente || cliente || ''; // puede venir en query o header
+
   fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
     if (err) return next(err);
     let reparaciones = JSON.parse(data || '[]');
 
-    if (cliente) {
+    if (rol === 'cliente') {
+      // El campo cliente puede estar en el usuario o en el query/header
+      if (!clienteFiltro) {
+        return res.status(403).json({ error: 'No tienes asociado un cliente. Consulta al administrador.' });
+      }
       reparaciones = reparaciones.filter(r =>
-        r.cliente.toLowerCase() === cliente.toLowerCase()
+        r.cliente && r.cliente.toLowerCase() === clienteFiltro.toLowerCase()
+      );
+    } else if (clienteFiltro) {
+      // Permite a un admin filtrar por cliente usando query param
+      reparaciones = reparaciones.filter(r =>
+        r.cliente && r.cliente.toLowerCase() === clienteFiltro.toLowerCase()
       );
     }
 
@@ -55,7 +76,6 @@ router.post(
     });
   }
 );
-
 
 // ========== PUT ==========
 router.put('/:codigo', (req, res, next) => {
@@ -101,4 +121,3 @@ router.delete('/:codigo', (req, res, next) => {
 });
 
 module.exports = router;
-

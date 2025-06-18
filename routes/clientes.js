@@ -7,20 +7,23 @@ const router = express.Router();
 const clientesPath = path.join(__dirname, '..', 'clientes.json');
 if (!fs.existsSync(clientesPath)) fs.writeFileSync(clientesPath, '[]', 'utf-8');
 
-// GET - Listar clientes
+// GET - Solo nombres para selects rápidos (opcional, si tu clientes.json tiene más info)
 router.get('/', (req, res, next) => {
   fs.readFile(clientesPath, 'utf-8', (err, data) => {
     if (err) return next(err);
-    res.json(JSON.parse(data || '[]'));
+    let arr = [];
+    try { arr = JSON.parse(data); } catch { return res.json([]); }
+    res.json(arr); // <-- DEVOLVÉ LOS OBJETOS COMPLETOS
   });
 });
+
 
 // POST - Agregar cliente
 router.post(
   '/',
   [
     body('codigo').notEmpty().withMessage('El campo "codigo" es obligatorio'),
-    body('razonSocial').notEmpty().withMessage('El campo "razonSocial" es obligatorio')
+    body('nombre').notEmpty().withMessage('El campo "nombre" es obligatorio')
   ],
   (req, res, next) => {
     const errors = validationResult(req);
@@ -108,3 +111,4 @@ router.delete(
 );
 
 module.exports = router;
+

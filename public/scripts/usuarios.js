@@ -1,94 +1,229 @@
-document.addEventListener("DOMContentLoaded", () => {
-  cargarUsuarios();
+let usuarios = [];
+let usuarioSeleccionado = null;
 
-  const usuarioForm = document.getElementById("usuarioForm");
-  usuarioForm.addEventListener("submit", async (e) => {
+// --- Helper para fetch autenticado ---
+function fetchAuth(url, options = {}) {
+  const user = localStorage.getItem('username');
+  const role = localStorage.getItem('rol');
+  options.headers = {
+    ...(options.headers || {}),
+    'x-user': user,
+    'x-role': role,
+    'Content-Type': 'application/json',
+  };
+  return fetch(url, options);
+}
+
+// ========== CLIENTES SELECT HELPERS ==========
+// Llena un select (por id de DIV contenedor) con las opciones de clientes, preseleccionando uno si corresponde
+async function llenarSelectClientesDesdeAPI(idDiv, selected = "") {
+  try {
+    const res = await fetch('/api/clientes');
+    if (!res.ok) throw new Error('No se pudieron cargar clientes');
+    const clientes = await res.json();
+    const div = document.getElementById(idDiv);
+    if (div) {
+      div.innerHTML = `
+        <select name="cliente" required>
+          <option value="">Seleccione cliente</option>
+          ${clientes.map(
+        c => `<option value="${c.codigo}" ${selected === c.codigo ? 'selected' : ''}>${c.fantasia || c.razonSocial || c.codigo}</option>`
+      ).join('')}
+        </select>
+      `;
+    }
+  } catch (err) {
+    console.error("Error llenando clientes:", err);
+  }
+}
+
+
+// Muestra/oculta el select de cliente en el modal agregar
+function toggleClienteSelect(rol) {
+  const selectDiv = document.getElementById('select-cliente-agregar');
+  if (rol === "cliente") {
+    selectDiv.style.display = "block";
+    llenarSelectClientesDesdeAPI('select-cliente-agregar');
+  } else {
+    selectDiv.style.display = "none";
+    selectDiv.innerHTML = "";
+  }
+}
+
+// Muestra/oculta y selecciona el cliente correcto en modal modificar
+function toggleClienteSelectEdit(rol, selectedCliente = "") {
+  const selectDiv = document.getElementById('select-cliente-modificar');
+  if (rol === "cliente") {
+    selectDiv.style.display = "block";
+    llenarSelectClientesDesdeAPI('select-cliente-modificar', selectedCliente);
+  } else {
+    selectDiv.style.display = "none";
+    selectDiv.innerHTML = "";
+  }
+}
+
+// ========== DOM READY ==========
+document.addEventListener("DOMContentLoaded", async () => {
+  const rol = localStorage.getItem('rol');
+  if (!rol || rol.toLowerCase() !== 'admin') {
+    window.location.href = '/reparaciones-vigentes';
+    return;
+  }
+
+  await cargarUsuarios();
+
+  // AGREGAR USUARIO
+  document.getElementById("form-agregar-usuario").onsubmit = async e => {
     e.preventDefault();
-    await guardarUsuario();
+    await agregarUsuario();
+  };
+
+  // MODIFICAR USUARIO
+  document.getElementById("form-modificar-usuario").onsubmit = async e => {
+    e.preventDefault();
+    await modificarUsuario();
+  };
+
+  // Evento mostrar/ocultar select cliente (agregar)
+  document.querySelector("#form-agregar-usuario select[name='rol']").addEventListener('change', e => {
+    toggleClienteSelect(e.target.value);
+  });
+
+  // Evento mostrar/ocultar select cliente (modificar)
+  document.querySelector("#form-modificar-usuario select[name='rol']").addEventListener('change', e => {
+    toggleClienteSelectEdit(e.target.value);
   });
 });
 
 async function cargarUsuarios() {
   try {
-    const response = await fetch("/api/usuarios");
-    if (!response.ok) throw new Error("Error al cargar usuarios");
-    const usuarios = await response.json();
+    const res = await fetchAuth("/api/usuarios");
+    usuarios = await res.json();
 
-    const tbody = document.querySelector("#tabla-usuarios tbody");
-    tbody.innerHTML = ""; // Limpiar tabla
+    const tbody = document.getElementById("usuarios-tbody");
+    tbody.innerHTML = "";
 
-    usuarios.forEach((usuario) => {
+    usuarios.forEach((usuario, i) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${usuario.email}</td>
         <td>${usuario.rol}</td>
-        <td>
-          <button onclick="editarUsuario('${usuario.email}')">Editar</button>
-          <button onclick="eliminarUsuario('${usuario.email}')">Eliminar</button>
-        </td>
+        <td>${usuario.cliente || ''}</td>
       `;
+      tr.addEventListener("click", () => seleccionarFila(i));
       tbody.appendChild(tr);
     });
   } catch (err) {
-    console.error(err);
+    console.error("Error al cargar usuarios:", err);
   }
 }
 
-function mostrarFormularioNuevoUsuario() {
-  document.getElementById("formulario-nuevo").style.display = "block";
-  document.getElementById("email").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("rol").value = "cliente";
+function seleccionarFila(index) {
+  const filas = document.querySelectorAll("#usuarios-tbody tr");
+  filas.forEach(f => f.classList.remove("seleccionado"));
+  filas[index].classList.add("seleccionado");
+  usuarioSeleccionado = usuarios[index];
 }
 
-async function guardarUsuario() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const rol = document.getElementById("rol").value;
-
-  try {
-    const response = await fetch("/api/usuarios", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, rol })
-    });
-    if (!response.ok) throw new Error("Error al guardar usuario");
-    alert("Usuario guardado correctamente");
-    document.getElementById("formulario-nuevo").style.display = "none";
-    cargarUsuarios();
-  } catch (err) {
-    console.error(err);
-    alert("Error al guardar usuario");
-  }
+function abrirModalAgregarUsuario() {
+  document.getElementById("form-agregar-usuario").reset();
+  document.getElementById("modal-agregar-usuario").style.display = "flex";
+  toggleClienteSelect(""); // Oculta select cliente al abrir
 }
 
-
-
-async function eliminarUsuario(email) {
-  if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-
-  try {
-    const response = await fetch(`/api/usuarios/${email}`, {
-      method: "DELETE"
-    });
-    if (!response.ok) throw new Error("Error al eliminar usuario");
-    alert("Usuario eliminado correctamente");
-    cargarUsuarios();
-  } catch (err) {
-    console.error(err);
-    alert("Error al eliminar usuario");
-  }
+function cerrarModalAgregarUsuario() {
+  document.getElementById("modal-agregar-usuario").style.display = "none";
 }
 
-function editarUsuario(email) {
-  // Por simplicidad, usar email como ID
-  const fila = Array.from(document.querySelectorAll("#tabla-usuarios tbody tr"))
-    .find(tr => tr.children[0].textContent === email);
-
-  if (fila) {
-    document.getElementById("formulario-nuevo").style.display = "block";
-    document.getElementById("email").value = email;
-    document.getElementById("password").value = "";
-    document.getElementById("rol").value = fila.children[1].textContent;
+function abrirModalModificarUsuario() {
+  if (!usuarioSeleccionado) {
+    alert("Selecciona un usuario.");
+    return;
   }
+  const form = document.getElementById("form-modificar-usuario");
+  form.email.value = usuarioSeleccionado.email;
+  form.rol.value = usuarioSeleccionado.rol;
+  toggleClienteSelectEdit(usuarioSeleccionado.rol, usuarioSeleccionado.cliente || "");
+  document.getElementById("modal-modificar-usuario").style.display = "flex";
+}
+
+function cerrarModalModificarUsuario() {
+  document.getElementById("modal-modificar-usuario").style.display = "none";
+}
+
+async function agregarUsuario() {
+  const form = document.getElementById("form-agregar-usuario");
+  const data = Object.fromEntries(new FormData(form).entries());
+  if (data.rol === "cliente") {
+    const clienteSelect = document.querySelector('#select-cliente-agregar select[name="cliente"]');
+    if (!clienteSelect || !clienteSelect.value) {
+      alert("Debe seleccionar un cliente.");
+      return;
+    }
+    data.cliente = clienteSelect.value;
+  }
+  const res = await fetchAuth("/api/usuarios", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    alert(error.error || "Error al agregar usuario.");
+    return;
+  }
+
+  cerrarModalAgregarUsuario();
+  await cargarUsuarios();
+}
+
+async function modificarUsuario() {
+  const form = document.getElementById("form-modificar-usuario");
+  const data = Object.fromEntries(new FormData(form).entries());
+  if (data.rol === "cliente") {
+    const cliente = document.querySelector('#select-cliente-modificar select[name="cliente"]').value;
+    if (!cliente) {
+      alert("Debe seleccionar un cliente.");
+      return;
+    }
+    data.cliente = cliente;
+  }
+
+  const res = await fetchAuth(`/api/usuarios/${usuarioSeleccionado.email}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    alert(error.error || "Error al modificar usuario.");
+    return;
+  }
+
+  cerrarModalModificarUsuario();
+  await cargarUsuarios();
+}
+
+async function eliminarUsuario() {
+  if (!usuarioSeleccionado) {
+    alert("Selecciona un usuario para eliminar.");
+    return;
+  }
+
+  if (!confirm(`¿Eliminar a ${usuarioSeleccionado.email}?`)) return;
+
+  const res = await fetchAuth(`/api/usuarios/${usuarioSeleccionado.email}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    alert(error.error || "Error al eliminar usuario.");
+    return;
+  }
+
+  usuarioSeleccionado = null;
+  await cargarUsuarios();
 }

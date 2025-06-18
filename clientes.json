@@ -1,16 +1,5 @@
 [
   {
-    "codigo": "B001",
-    "razonSocial": "Blucar SA",
-    "fantasia": "Bluecar",
-    "domicilio": "California 2067 (CP 1289)",
-    "localidad": "Barracas",
-    "provincia": "Ciudad Autónoma de Buenos Aires",
-    "telefono": "1141499139",
-    "mail": "info@bluecar.com.ar",
-    "documento": "30-70792490-6"
-  },
-  {
     "codigo": "C001",
     "razonSocial": "Cofaypro S:R:L",
     "fantasia": "Cofaypro",
@@ -20,5 +9,16 @@
     "telefono": "1146864784",
     "mail": "",
     "documento": "30-71203432-3"
+  },
+  {
+    "codigo": "B001",
+    "razonSocial": "Blucar SA",
+    "fantasia": "Bluecar",
+    "domicilio": "California 2067 (CP 1289)",
+    "localidad": "Ciudad Autonoma de Buenos Aires",
+    "provincia": "CABA",
+    "telefono": "41266750",
+    "mail": "info@bluecar.com.ar",
+    "documento": "30-70792490-6"
   }
 ]

@@ -1,4 +1,12 @@
 let entregadas = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const rol = localStorage.getItem('rol');
+  if (rol && rol.toLowerCase() === 'cliente' && !window.location.pathname.includes('reparaciones-vigentes')) {
+    window.location.href = '/reparaciones-vigentes';
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     cargarEntregadas();
 });
