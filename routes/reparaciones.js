@@ -1,123 +1,113 @@
-// routes/reparaciones.js
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
+const db = require('../db');
 
-const reparacionesPath = path.join(__dirname, '..', 'reparaciones.json');
-if (!fs.existsSync(reparacionesPath)) fs.writeFileSync(reparacionesPath, '[]', 'utf-8');
-
-// Helper para leer headers
-function getUserInfo(req) {
-  return {
-    rol: (req.headers['x-role'] || '').toLowerCase(),
-    email: req.headers['x-user'] || '',
-    cliente: req.headers['x-cliente'] || '', // opcional, según implementación
-  };
-}
-
-// ========== GET ==========
-router.get('/', (req, res, next) => {
-  const { rol, email, cliente } = getUserInfo(req);
-  let clienteFiltro = req.query.cliente || cliente || ''; // puede venir en query o header
-
-  fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-    if (err) return next(err);
-    let reparaciones = JSON.parse(data || '[]');
-
-    if (rol === 'cliente') {
-      // El campo cliente puede estar en el usuario o en el query/header
-      if (!clienteFiltro) {
-        return res.status(403).json({ error: 'No tienes asociado un cliente. Consulta al administrador.' });
-      }
-      reparaciones = reparaciones.filter(r =>
-        r.cliente && r.cliente.toLowerCase() === clienteFiltro.toLowerCase()
-      );
-    } else if (clienteFiltro) {
-      // Permite a un admin filtrar por cliente usando query param
-      reparaciones = reparaciones.filter(r =>
-        r.cliente && r.cliente.toLowerCase() === clienteFiltro.toLowerCase()
-      );
-    }
-
-    res.json(reparaciones);
-  });
+// GET - Listar reparaciones (puede filtrar por cliente_codigo)
+router.get('/', async (req, res, next) => {
+  const cliente_codigo = req.query.cliente;
+  let query = 'SELECT * FROM reparaciones';
+  let params = [];
+  if (cliente_codigo) {
+    query += ' WHERE cliente_codigo = $1';
+    params.push(cliente_codigo);
+  }
+  try {
+    const result = await db.query(query, params);
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
 });
 
-// ========== POST ==========
-router.post(
-  '/',
-  [
-    body('codigo').notEmpty().withMessage('El campo "codigo" es obligatorio')
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+// POST - Agregar reparación
+router.post('/', [
+  body('codigo').notEmpty(),
+  body('tipo').notEmpty(),
+  body('modelo').notEmpty(),
+  body('cliente_codigo').notEmpty(),
+  body('estado').notEmpty(),
+  body('fecha_ingreso').notEmpty(),
+
+], async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  // ←⛔️ ACÁ ES DONDE FALLA
+  const { id, codigo, tipo, modelo, cliente_codigo, estado, fecha_ingreso, fecha_entrega, garantia, descripcion, creado_por } = req.body;
+
+  try {
+    await db.query(
+      `INSERT INTO reparaciones 
+      (id, codigo, tipo, modelo, cliente_codigo, estado, fecha_ingreso, fecha_entrega, garantia, descripcion, creado_por)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+      [
+        id || null, // <- Si no mandás id, va null
+        codigo,
+        tipo,
+        modelo,
+        cliente_codigo,
+        estado,
+        fecha_ingreso,
+        fecha_entrega || null,
+        garantia === true || garantia === 'true',
+        descripcion || '',
+        creado_por || null
+      ]
+    );
+    res.status(201).json({ mensaje: 'Reparación agregada' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+// PUT - Modificar reparación
+router.put(
+  '/:codigo',
+  [param('codigo').notEmpty()],
+  async (req, res, next) => {
+    const codigoOriginal = req.params.codigo;
+    const {
+      codigo, // 👈 Nuevo código (puede ser igual al original o modificado)
+      tipo, modelo, cliente_codigo, estado,
+      fecha_ingreso, fecha_entrega, garantia,
+      descripcion, creado_por
+    } = req.body;
+    try {
+      const result = await db.query(
+        `UPDATE reparaciones SET
+          codigo=$1, tipo=$2, modelo=$3, cliente_codigo=$4, estado=$5, fecha_ingreso=$6,
+          fecha_entrega=$7, garantia=$8, descripcion=$9, creado_por=$10
+        WHERE codigo=$11`,
+        [
+          codigo, tipo, modelo, cliente_codigo, estado, fecha_ingreso,
+          fecha_entrega || null, garantia || false, descripcion || '', creado_por || null,
+          codigoOriginal // 👈 Importante: buscá por el viejo, actualizá con el nuevo
+        ]
+      );
+      if (result.rowCount === 0) return res.status(404).json({ error: 'Reparación no encontrada' });
+      res.json({ mensaje: 'Reparación modificada' });
+    } catch (err) {
+      next(err);
     }
-
-    const nueva = req.body;
-    fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-      if (err) return next(err);
-      const arr = JSON.parse(data || '[]');
-
-      if (arr.some(r => r.id === nueva.id)) {
-        return res.status(400).json({ error: 'ID ya existente. El ID debe ser único.' });
-      }
-
-      nueva.historial = Array.isArray(nueva.historial) ? nueva.historial : [];
-      arr.push(nueva);
-
-      fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
-        if (err) return next(err);
-        res.status(201).json({ mensaje: 'Reparación agregada.' });
-      });
-    });
   }
 );
 
-// ========== PUT ==========
-router.put('/:codigo', (req, res, next) => {
-  const codigo = req.params.codigo;
-  const actualizado = req.body;
-
-  fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-    if (err) return next(err);
-    let arr = JSON.parse(data || '[]');
-    const idx = arr.findIndex(r => r.codigo === codigo);
-
-    if (idx === -1) {
-      return res.status(404).json({ error: 'Reparación no encontrada.' });
+// DELETE - Eliminar reparación
+router.delete(
+  '/:codigo',
+  [param('codigo').notEmpty()],
+  async (req, res, next) => {
+    const codigo = req.params.codigo;
+    try {
+      const result = await db.query('DELETE FROM reparaciones WHERE codigo=$1', [codigo]);
+      if (result.rowCount === 0) return res.status(404).json({ error: 'Reparación no encontrada' });
+      res.json({ mensaje: 'Reparación eliminada' });
+    } catch (err) {
+      next(err);
     }
-
-    arr[idx] = { ...arr[idx], ...actualizado };
-
-    fs.writeFile(reparacionesPath, JSON.stringify(arr, null, 2), err => {
-      if (err) return next(err);
-      res.json({ mensaje: 'Reparación modificada.' });
-    });
-  });
-});
-
-// ========== DELETE ==========
-router.delete('/:codigo', (req, res, next) => {
-  const codigo = req.params.codigo;
-
-  fs.readFile(reparacionesPath, 'utf-8', (err, data) => {
-    if (err) return next(err);
-    let arr = JSON.parse(data || '[]');
-    const filtrado = arr.filter(r => r.codigo !== codigo);
-
-    if (filtrado.length === arr.length) {
-      return res.status(404).json({ error: 'Reparación no encontrada.' });
-    }
-
-    fs.writeFile(reparacionesPath, JSON.stringify(filtrado, null, 2), err => {
-      if (err) return next(err);
-      res.json({ mensaje: 'Reparación eliminada.' });
-    });
-  });
-});
+  }
+);
 
 module.exports = router;

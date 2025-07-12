@@ -481,8 +481,8 @@ body.usuarios-page {
 }
 
 .tr-alerta-tiempo {
-  background: linear-gradient(90deg, #ffe0e0 55%, #fff5f5 100%) !important;
-  color: #b12323 !important;
+  background: linear-gradient(40deg, #e5f3fd 55%, #fff5f5 100%) !important;
+  color: #7f1313 !important;
   box-shadow: 0 2px 8px 0 rgba(190, 40, 40, 0.12);
   font-weight: 500;
 }
@@ -498,8 +498,198 @@ body.usuarios-page {
   transition: background 0.3s, color 0.3s;
 }
 
+.btn-ordenar {
+  background: #e9ecfa;
+  color: #31325b;
+  padding: 7px 18px;
+  border-radius: 8px;
+  border: 1px solid #b3bfe7;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s, box-shadow .2s;
+  box-shadow: 0 2px 8px #0001;
+  margin-bottom: 2px;
+}
+.btn-ordenar:hover {
+  background: #d6e1ff;
+  color: #27305e;
+}
 
+/* Ancho fijo para columna de acción en las tablas de licitaciones */
+.tabla-licitaciones th.col-accion,
+.tabla-licitaciones td.col-accion {
+  width: 56px;
+  min-width: 50px;
+  max-width: 60px;
+  text-align: center;
+  overflow: visible;
+}
 
+.fila-seleccionada {
+  background: #ccefff !important;
+  outline: 2px solid #1976d2;
+}
 
+/* --- REPARACIONES DOTA - TABLA MODERNA --- */
+.tabla-licitaciones th, 
+.tabla-licitaciones td {
+  padding: 15px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e6eef7;
+}
 
+.tabla-licitaciones {
+  width: 100%;
+  min-width: 960px;        /* así evitás que la tabla se achique demasiado */
+  max-width: 98vw;
+  margin: 0 auto 38px auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px #bbb2;
+  font-size: 1.08rem;
+  overflow: auto;
+}
 
+.tabla-licitaciones th {
+  background: #f2f6fa;
+  font-weight: 700;
+  color: #125c98;
+  font-size: 1.03rem;
+  border-bottom: 2px solid #e6eef7;
+  /* min-width para columnas clave */
+}
+.tabla-licitaciones th:nth-child(1) { min-width: 100px; }  /* Nº Pedido */
+.tabla-licitaciones th:nth-child(2) { min-width: 110px; }  /* Código */
+.tabla-licitaciones th:nth-child(3) { min-width: 220px; }  /* Descripción */
+.tabla-licitaciones th:nth-child(4) { min-width: 70px; }   /* Cant. */
+.tabla-licitaciones th:nth-child(5) { min-width: 130px; }  /* Destino */
+.tabla-licitaciones th:nth-child(6) { min-width: 150px; }  /* Razón Social */
+.tabla-licitaciones th:nth-child(7) { min-width: 135px; }  /* Entrega Parcial */
+.tabla-licitaciones th:nth-child(8) { min-width: 110px; }  /* Pendientes */
+.tabla-licitaciones th:nth-child(9) { min-width: 110px; }  /* Acción */
+
+.tabla-licitaciones tr:hover {
+  background: #e5f2ff55;
+}
+
+.tabla-licitaciones td {
+  font-size: 1.01rem;
+  vertical-align: middle;
+}
+
+.tabla-licitaciones input[type='number'] {
+  width: 60px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid #b5d3f7;
+  font-size: 1rem;
+  text-align: right;
+  background: #f9fbff;
+}
+
+/* Botón entrega prolijo */
+.tabla-licitaciones .btn-entrega {
+  background: linear-gradient(90deg, #0074d9 60%, #1ec2c2 100%);
+  color: #fff;
+  border: none;
+  padding: 5px 16px;
+  border-radius: 8px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-left: 8px;
+  box-shadow: 0 2px 8px #145eab14;
+  cursor: pointer;
+  transition: background 0.16s, transform 0.15s;
+}
+.tabla-licitaciones .btn-entrega:hover {
+  background: linear-gradient(90deg, #145eab 40%, #3ad2c5 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.tabla-licitaciones .entregado-label {
+  color: #1d986c;
+  background: #eafff2;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 7px;
+  padding: 2px 13px;
+  margin-left: 2px;
+  letter-spacing: 0.2px;
+}
+
+.tabla-licitaciones th {
+  border-bottom: 3px solid #2176bd !important;   /* Azul definido, bien visible */
+  background: #f2f6fa;
+  font-weight: 700;
+  color: #125c98;
+  font-size: 1.03rem;
+}
+
+/* Borde izquierdo y derecho también, opcional para efecto “card” */
+.tabla-licitaciones {
+  border: 1.5px solid #2176bd;
+  box-shadow: 0 2px 16px #bbb2;
+  border-radius: 12px;
+}
+
+.tabla-licitaciones th {
+  background: #e4effa; /* Un celestito más fuerte que el fondo */
+  border-bottom: 3px solid #2176bd !important;
+}
+
+.entregado {
+  background: linear-gradient(90deg, #b5ffd9, #39e29a 85%);
+  color: #156739;
+  font-weight: bold;
+  border-radius: 13px;
+  padding: 5px 16px;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px #45e68524;
+  display: inline-block;
+  margin: 0 3px;
+  text-align: center;
+  border: 1.5px solid #20ba75;
+  transition: background 0.23s, color 0.23s;
+}
+
+@media (max-width: 950px) {
+  .tabla-licitaciones {
+    min-width: 680px;
+    font-size: 0.97em;
+  }
+}
+@media (max-width: 750px) {
+  .tabla-licitaciones {
+    min-width: 580px;
+    font-size: 0.93em;
+  }
+}
+@media (max-width: 600px) {
+  .tabla-licitaciones {
+    min-width: 430px;
+    font-size: 0.88em;
+  }
+  .tabla-licitaciones th, .tabla-licitaciones td {
+    padding: 8px 4px;
+  }
+}
+
+.tabla-licitaciones th,
+.tabla-licitaciones td {
+  padding: 12px 10px;
+  min-width: 90px;   /* o ajustá según necesidad */
+}
+
+@media (max-width: 800px) {
+  .tabla-licitaciones, .tabla-licitaciones thead, .tabla-licitaciones tbody, .tabla-licitaciones th, .tabla-licitaciones td, .tabla-licitaciones tr {
+    display: block;
+    width: 100%;
+  }
+  .tabla-licitaciones th, .tabla-licitaciones td {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+  }
+}

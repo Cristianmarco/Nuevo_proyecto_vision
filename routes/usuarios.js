@@ -1,99 +1,99 @@
-// routes/usuarios.js
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const bcrypt = require('bcryptjs');
+const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
-const { checkRole } = require('../middleware/auth'); // <--- Importa el middleware
+const db = require('../db');
 
-const usuariosPath = path.join(__dirname, '../data/usuarios.json');
-
-function normalizeEmail(email) {
-  return (email || '').trim().toLowerCase();
-}
-
-const ROLES_VALIDOS = ['admin', 'cliente'];
-
-// Sólo ADMIN puede gestionar usuarios
-
-// Obtener usuarios (NO devuelve password nunca)
-router.get('/', checkRole('admin'), (req, res) => {
-  const usuarios = JSON.parse(fs.readFileSync(usuariosPath, 'utf-8'));
-  const safeUsers = usuarios.map(u => ({ email: u.email, rol: u.rol }));
-  res.json(safeUsers);
+// GET: listar usuarios
+router.get('/', async (req, res, next) => {
+  try {
+    const result = await db.query('SELECT * FROM usuarios ORDER BY email');
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
 });
 
-// Agregar usuario (solo admin)
-router.post('/', checkRole('admin'), async (req, res) => {
-  let { email, password, rol, cliente } = req.body;
-  email = normalizeEmail(email);
+// POST: agregar usuario
+router.post(
+  '/',
+  [
+    body('email').isEmail(),
+    body('password').notEmpty(),
+    body('rol').notEmpty(),
+    // body('cliente').optional() // si es "cliente" debe existir en clientes
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  if (!email || !password || !rol) {
-    return res.status(400).json({ error: 'Todos los campos son requeridos.' });
+    const { email, password, rol, cliente_codigo } = req.body;
+
+    try {
+      // Validar que no exista el email
+      const existe = await db.query('SELECT 1 FROM usuarios WHERE email=$1', [email]);
+      if (existe.rowCount > 0) return res.status(400).json({ error: 'Email ya registrado' });
+
+      await db.query(
+        'INSERT INTO usuarios (email, password, rol, cliente_codigo) VALUES ($1,$2,$3,$4)',
+        [email, password, rol, cliente_codigo || null]
+      );
+      res.status(201).json({ mensaje: 'Usuario agregado' });
+    } catch (err) {
+      next(err);
+    }
   }
-  if (!ROLES_VALIDOS.includes(rol)) {
-    return res.status(400).json({ error: 'Rol inválido.' });
+);
+
+// PUT: modificar usuario
+router.put(
+  '/:email',
+  [
+    param('email').isEmail(),
+    body('password').optional(),
+    body('rol').optional(),
+    body('cliente_codigo').optional()
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const email = req.params.email;
+    const { password, rol, cliente_codigo } = req.body; // ARREGLADO
+
+    try {
+      const result = await db.query(
+        `UPDATE usuarios SET
+          password = COALESCE($1, password),
+          rol = COALESCE($2, rol),
+          cliente_codigo = COALESCE($3, cliente_codigo)
+        WHERE email = $4`,
+        [password, rol, cliente_codigo, email] // ARREGLADO
+      );
+      if (result.rowCount === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+      res.json({ mensaje: 'Usuario modificado' });
+    } catch (err) {
+      next(err);
+    }
   }
+);
 
-  let usuarios = JSON.parse(fs.readFileSync(usuariosPath, 'utf-8'));
+// DELETE: eliminar usuario
+router.delete(
+  '/:email',
+  [param('email').isEmail()],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  if (usuarios.find(u => normalizeEmail(u.email) === email)) {
-    return res.status(400).json({ error: 'El usuario ya existe.' });
+    const email = req.params.email;
+    try {
+      const result = await db.query('DELETE FROM usuarios WHERE email=$1', [email]);
+      if (result.rowCount === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+      res.json({ mensaje: 'Usuario eliminado' });
+    } catch (err) {
+      next(err);
+    }
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Solo agregar campo cliente si es usuario cliente
-  const nuevoUsuario = rol === "cliente"
-    ? { email, password: hashedPassword, rol, cliente }
-    : { email, password: hashedPassword, rol };
-
-  usuarios.push(nuevoUsuario);
-
-  fs.writeFileSync(usuariosPath, JSON.stringify(usuarios, null, 2));
-  res.json({ message: 'Usuario agregado exitosamente.' });
-});
-
-// Eliminar usuario (solo admin)
-router.delete('/:email', checkRole('admin'), (req, res) => {
-  const email = normalizeEmail(req.params.email);
-  let usuarios = JSON.parse(fs.readFileSync(usuariosPath, 'utf-8'));
-
-  const prevLength = usuarios.length;
-  usuarios = usuarios.filter(u => normalizeEmail(u.email) !== email);
-
-  if (usuarios.length === prevLength) {
-    return res.status(404).json({ error: 'Usuario no encontrado.' });
-  }
-
-  fs.writeFileSync(usuariosPath, JSON.stringify(usuarios, null, 2));
-  res.json({ message: 'Usuario eliminado.' });
-});
-
-router.put('/:email', checkRole('admin'), async (req, res) => {
-  const email = normalizeEmail(req.params.email);
-  let { password, rol } = req.body;
-
-  let usuarios = JSON.parse(fs.readFileSync(usuariosPath, 'utf-8'));
-  const index = usuarios.findIndex(u => normalizeEmail(u.email) === email);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Usuario no encontrado.' });
-  }
-
-  if (rol && !ROLES_VALIDOS.includes(rol)) {
-    return res.status(400).json({ error: 'Rol inválido.' });
-  }
-
-  if (password) {
-    usuarios[index].password = await bcrypt.hash(password, 10);
-  }
-  if (rol) {
-    usuarios[index].rol = rol;
-  }
-
-  fs.writeFileSync(usuariosPath, JSON.stringify(usuarios, null, 2));
-  res.json({ message: 'Usuario actualizado exitosamente.' });
-});
+);
 
 module.exports = router;

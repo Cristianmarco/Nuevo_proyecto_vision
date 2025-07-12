@@ -51,6 +51,13 @@
       <input type="text" id="busqueda-global" placeholder="Buscar en todas las reparaciones..."
         oninput="buscarGlobal()">
     </section>
+
+    <div style="margin-bottom: 10px; text-align:right;">
+      <button id="ordenar-fecha" onclick="invertirOrden()" class="btn-ordenar">
+        Invertir <i class="fas fa-sort"></i>
+      </button>
+    </div>
+
     <section class="table-section">
       <table class="tabla-reparaciones">
         <thead>
@@ -78,18 +85,20 @@
     </section>
   </main>
 
-  <!-- Modales Agregar / Modificar / Visualizar -->
+  <!-- MODAL AGREGAR REPARACIÓN -->
   <div id="modal-agregar" class="modal">
     <div class="modal-contenido">
       <span class="cerrar" onclick="cerrarModalAgregar()">&times;</span>
       <h2>Agregar Reparación</h2>
       <form id="form-agregar">
-        <input type="date" name="fechaIngreso" required />
+        <input type="date" name="fecha_ingreso" required />
         <input type="text" name="codigo" placeholder="Código" required />
         <input type="text" name="tipo" placeholder="Tipo" required />
         <input type="text" name="modelo" placeholder="Modelo" />
-        <input type="text" name="cliente" placeholder="Cliente" required />
-        <input type="text" name="id" placeholder="ID" />
+        <select name="cliente_codigo" id="select-cliente-agregar" required>
+          <option value="">-- Seleccione Cliente --</option>
+        </select>
+        <input type="text" name="id" placeholder="ID (opcional, se asigna luego)" />
         <input type="text" name="estado" placeholder="Estado" />
         <label class="checkbox-label">
           <input type="checkbox" name="garantia"> Garantía
@@ -99,17 +108,20 @@
     </div>
   </div>
 
+  <!-- MODAL MODIFICAR REPARACIÓN -->
   <div id="modal-modificar" class="modal">
     <div class="modal-contenido">
       <span class="cerrar" onclick="cerrarModalModificar()">&times;</span>
       <h2>Modificar Reparación</h2>
       <form id="form-modificar">
-        <input type="date" name="fechaIngreso" required />
+        <input type="date" name="fecha_ingreso" required />
         <input type="text" name="codigo" placeholder="Código" required />
         <input type="text" name="tipo" placeholder="Tipo" required />
         <input type="text" name="modelo" placeholder="Modelo" />
-        <input type="text" name="cliente" placeholder="Cliente" required />
-        <input type="text" name="id" placeholder="ID" readonly />
+        <select name="cliente_codigo" id="select-cliente-modificar" required>
+          <option value="">-- Seleccione Cliente --</option>
+        </select>
+        <input type="text" name="id" placeholder="ID" />
         <input type="text" name="estado" placeholder="Estado" />
         <label class="checkbox-label">
           <input type="checkbox" name="garantia"> Garantía
@@ -118,6 +130,7 @@
       </form>
     </div>
   </div>
+
 
 
   <!-- MODAL VISUALIZAR HISTORIAL -->
@@ -157,7 +170,8 @@
         required></textarea>
       <textarea id="observaciones-reparacion" class="campo-modal" placeholder="Observaciones..." required></textarea>
       <input type="text" id="tecnico-reparacion" class="campo-modal" placeholder="Técnico" required>
-      <button class="btn-historial btn-guardar" onclick="guardarHistorial()">
+      <label><input type="checkbox" id="historial-garantia"> Garantía</label>
+      <button class="btn-historial btn-guardar" onclick="guardarNuevoRegistroHistorial()">
         <i class="fas fa-save"></i> Guardar
       </button>
     </div>

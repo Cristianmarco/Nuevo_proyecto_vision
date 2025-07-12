@@ -363,3 +363,210 @@ input[readonly] {
 #formulario-usuario .btn-guardar:hover {
   background-color: #00a653;
 }
+
+/* ===== ESTILO MODAL LICITACIÓN ===== */
+.modal-licitacion {
+  max-width: 670px;
+  width: 97vw;
+  padding: 32px 36px 24px 36px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 36px #156fa51d;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-grid {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.form-grid > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 155px;
+}
+
+.modal-licitacion label {
+  font-size: 1.02rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #285;
+}
+
+.modal-licitacion input,
+.modal-licitacion textarea {
+  border: 1.3px solid #e0e4f5;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 1.02rem;
+  background: #f9fbfd;
+  margin-bottom: 3px;
+  resize: none;
+  font-family: inherit;
+}
+
+.modal-licitacion textarea { min-height: 38px; }
+
+.btn-agregar-item {
+  display: inline-block;
+  margin-top: 12px;
+  background: #f3faff;
+  color: #1993db;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 19px;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.17s;
+  box-shadow: 0 1.5px 8px #1993db15;
+}
+.btn-agregar-item:hover {
+  background: #e6f3fc;
+  color: #127;
+}
+
+.tabla-items-modal th, .tabla-items-modal td {
+  padding: 8px 8px;
+  font-size: 0.97rem;
+}
+
+.botones-modal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+@media (max-width: 670px) {
+  .modal-licitacion {
+    padding: 14px 6vw 14px 6vw;
+    max-width: 98vw;
+  }
+  .form-grid { gap: 10px; }
+}
+.form-observacion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.form-observacion label {
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #285;
+}
+.form-observacion textarea {
+  min-height: 38px;
+  font-size: 1.04rem;
+  border: 1.3px solid #e0e4f5;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #f9fbfd;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.modal-licitacion {
+  overflow-x: visible !important;      /* Permitir contenido fuera del modal si es necesario */
+  padding-right: 32px !important;      /* Espacio extra a la derecha */
+}
+
+.tabla-items-modal {
+  display: block;
+  width: 100%;
+  overflow-x: auto;       /* Scroll horizontal solo si es necesario */
+  margin-bottom: 12px;
+}
+
+/* Ajustar columnas para que nunca achique el botón */
+.tabla-items-modal th:last-child,
+.tabla-items-modal td:last-child {
+  min-width: 54px;
+  width: 54px;
+  text-align: center;
+  padding-right: 6px;
+}
+
+.modal-licitacion {
+  max-width: 800px !important;
+  padding-right: 36px !important;
+}
+.tabla-items-modal th:last-child,
+.tabla-items-modal td:last-child {
+  min-width: 54px;
+  width: 54px;
+  text-align: center;
+  padding-right: 8px;
+}
+.tabla-items-modal {
+  width: 100%;
+  min-width: 500px;
+}
+
+/* Botón eliminar ítem compacto */
+.btn-eliminar-mini {
+  background: #e3e8ef !important;
+  color: #bb1826 !important;
+  font-size: 1.18rem !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  border: none;
+  box-shadow: none;
+  transition: background 0.14s;
+}
+.btn-eliminar-mini:hover {
+  background: #f5bebe !important;
+  color: #d80e24 !important;
+}
+
+@media (max-width: 700px) {
+  .modal-licitacion {
+    max-width: 98vw !important;
+    padding: 12px !important;
+  }
+  .modal-licitacion h2 { font-size: 1.3rem; }
+}
+
+.btn-agregar-item {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 8px 18px;
+  background: #e9f3fc;
+  color: #145baa;
+  border: 1px solid #8ab6e6;
+  border-radius: 7px;
+  transition: background .17s;
+}
+.btn-agregar-item:hover {
+  background: #d0e7fa;
+}
+.icon-button.cancelar:hover {
+  background: #ffe7e7 !important;
+  color: #ad2a2a !important;
+  border-color: #ffbdbd !important;
+}
+.icon-button.agregar:hover {
+  background: #10af39 !important;
+  color: #fff;
+}
+
+.tabla-items-modal th,
+.tabla-items-modal td {
+  min-width: 60px;
+  text-align: left;
+}
+
+.tabla-items-modal input,
+.tabla-items-modal select {
+  box-sizing: border-box;
+  font-size: 1rem;
+  padding: 5px 6px;
+}

@@ -35,3 +35,6 @@ public/uploads/
 
 # Data files
 *.json
+
+.env
+

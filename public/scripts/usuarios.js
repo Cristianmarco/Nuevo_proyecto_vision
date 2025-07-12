@@ -227,3 +227,26 @@ async function eliminarUsuario() {
   usuarioSeleccionado = null;
   await cargarUsuarios();
 }
+
+function togglePassword(inputId, iconSpan) {
+  const input = document.getElementById(inputId);
+  if (!input) return; // no existe el input
+  let icon = iconSpan.querySelector('i');
+  if (!icon) {
+    // si no encuentra <i>, lo agrega
+    icon = document.createElement('i');
+    icon.className = 'fa fa-eye';
+    iconSpan.appendChild(icon);
+  }
+  if (input.type === "password") {
+    input.type = "text";
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = "password";
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+
+

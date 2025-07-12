@@ -129,6 +129,56 @@
   background: linear-gradient(to right, #1a73e8, #4da6ff);
 }
 
+.btn-aceptada-mini {
+  padding: 5px 16px;
+  background: #e0fce9;
+  color: #11703a;
+  font-size: 0.98rem;
+  border: none;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background 0.17s;
+  margin: 0 auto;
+  display: block;
+}
+.btn-aceptada-mini:hover {
+  background: #c2f7d1;
+  color: #066c2a;
+}
 
+.badge-entregado {
+  display: inline-block;
+  background: #28b37e;
+  color: #fff;
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+}
 
+.btn-agregar-item {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 8px 18px;
+  background: #e9f3fc;
+  color: #145baa;
+  border: 1px solid #8ab6e6;
+  border-radius: 7px;
+  transition: background .17s;
+}
+.btn-agregar-item:hover {
+  background: #d0e7fa;
+}
+.icon-button.cancelar:hover {
+  background: #ffe7e7 !important;
+  color: #ad2a2a !important;
+  border-color: #ffbdbd !important;
+}
+.icon-button.agregar:hover {
+  background: #10af39 !important;
+  color: #fff;
+}
 

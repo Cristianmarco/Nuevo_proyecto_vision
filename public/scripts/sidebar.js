@@ -1,10 +1,10 @@
 console.log("sidebar.js ejecutado - rol:", localStorage.getItem('rol'));
 
-
 document.addEventListener('DOMContentLoaded', () => {
   const rol = localStorage.getItem('rol');
+  
   if (rol && rol.toLowerCase() === 'cliente') {
-    // Muestra solo la opción de reparaciones vigentes
+    // SOLO si es cliente, mostrar SOLO Reparaciones Vigentes y controlar navegación
     const sidebar = document.querySelector('.sidebar nav ul');
     if (sidebar) {
       sidebar.innerHTML = `
@@ -15,44 +15,37 @@ document.addEventListener('DOMContentLoaded', () => {
         </li>
       `;
     }
-    // Redirecciona si está en otra sección
-    if (!window.location.pathname.includes('reparaciones-vigentes')) {
-      window.location.href = '/reparaciones-vigentes';
+    // Forzá navegación solo si NO está en reparaciones-vigentes.html
+    const path = window.location.pathname;
+    if (!path.endsWith('reparaciones-vigentes.html')) {
+      window.location.href = '/views/reparaciones-vigentes.html';
     }
   }
 });
 
-function toggleSubmenu() {
-  const submenu = document.getElementById('clientes-submenu');
-  const icon = document.getElementById('submenu-icon');
-
-  if (submenu.style.display === 'flex') {
-    submenu.style.display = 'none';
-    icon.classList.remove('rotate');
-  } else {
-    submenu.style.display = 'flex';
-    icon.classList.add('rotate');
-  }
-}
-
+// Función global para navegación de sidebar
 function irA(seccion) {
-  switch (seccion) {
-    case 'main':
-      window.location.href = '/main';
-      break;
-    case 'clientes':
-      window.location.href = '/clientes';
-      break;
-    case 'reparaciones-vigentes':
-      window.location.href = '/reparaciones-vigentes';
-      break;
-    case 'historial':
-      window.location.href = '/historial';
-      break;
-    default:
-      console.warn('Sección no reconocida:', seccion);
+  if (seccion === 'dota-inicio') {
+    window.location.href = '/views/main.html';
+  } else if (seccion === 'dota-licitacion') {
+    window.location.href = '/views/dota.html';
+  } else if (seccion === 'dota-reparaciones') {
+    window.location.href = '/views/reparaciones_dota.html';
+  } else if (seccion === 'dota-garantias') {
+    window.location.href = '/views/garantias_dota.html';
+  } else if (seccion === 'externos') {
+    window.location.href = '/views/externos.html';
+  } else if (seccion === 'clientes') {
+    window.location.href = '/views/clientes.html';
+  } else if (seccion === 'reparaciones-vigentes') {
+    window.location.href = '/views/reparaciones_vigentes.html';
+  } else if (seccion === 'historial') {
+    window.location.href = '/views/historial.html';
+  } else {
+    window.location.href = '/views/main.html';
   }
 }
+window.irA = irA;
 
 function logout() {
   if (confirm('¿Seguro que deseas salir?')) {
@@ -62,4 +55,3 @@ function logout() {
     window.location.href = '/';
   }
 }
-

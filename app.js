@@ -5,10 +5,12 @@ const loginRouter = require('./routes/login');
 const vistasRouter = require('./routes/vistas');
 const clientesRouter = require('./routes/clientes');
 const reparacionesRouter = require('./routes/reparaciones');
-const entregadasRouter = require('./routes/historial');
+const entregadasRouter = require('./routes/entregadas');
 const session = require('express-session');
 const usuariosRouter = require('./routes/usuarios');
 const historialRouter = require('./routes/historial');
+const estadisticasRouter = require('./routes/estadisticas');
+const licitacionesRouter = require('./routes/licitaciones');
 
 app.use(session({
   secret: 'secretoSuperSeguro', // 🔐 ¡cambiá esto por algo fuerte en producción!
@@ -23,15 +25,21 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 // Usar rutas
 app.use('/api/login', loginRouter);
 app.use('/api/clientes', clientesRouter);
-app.use('/', vistasRouter);
 app.use('/api/reparaciones', reparacionesRouter);
 app.use('/api/entregadas', entregadasRouter);
 app.use('/api/usuarios', usuariosRouter);
-app.use('/historial', historialRouter);
+app.use('/api/historial', historialRouter);
+app.use('/', vistasRouter);
+app.use('/api/estadisticas', require('./routes/estadisticas'));
+app.use('/api/licitaciones', licitacionesRouter);
+app.use('/api/reparaciones_dota', require('./routes/reparaciones_dota'));
+
+
 
 // Error Handler Middleware (opcional)
 app.use((err, req, res, next) => {

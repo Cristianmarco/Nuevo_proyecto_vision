@@ -50,50 +50,62 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="content">
 
-    <div class="logo-animado-container">
-      <h1 class="bienvenida-texto">¡Bienvenido!</h1>
-      <object type="image/svg+xml" data="/images/image2vector.svg" class="logo-animado"></object>
+    <!-- Logo centrado arriba -->
+    <div class="logo-centrado-principal">
+      <img src="/images/logo.png" alt="Logo" />
     </div>
 
-
-    <section class="logo-container">
-      <svg id="logo-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
-        <!-- Texto AMORIM -->
-        <text id="logo-text" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle">
-          AMORIM
-        </text>
-        <!-- Círculo -->
-        <path id="logo-circle" d="M 120 100 a 60 60 0 1 1 0.1 0" />
-        <!-- Subrayado -->
-        <path id="logo-line" d="M 100 150 Q 200 180 300 150" />
-      </svg>
-    </section>
-
-
-    <section class="dashboard-cards">
-      <div class="card">
-        <div class="card-icon"><i class="fas fa-users"></i></div>
-        <div class="card-info">
-          <h3>Clientes</h3>
-          <p>148 registrados</p>
+    <!-- Tarjetas -->
+    <section class="dashboard-cards-principal">
+      <!-- Primera fila: Externos & Dota con badge -->
+      <div class="dashboard-row">
+        <div class="dashboard-card" id="card-externos">
+          <h3>
+            Externos
+            <span class="badge" id="badge-externos">-</span>
+          </h3>
+          <div class="stats">
+            <div><span id="vigentes-externos">-</span> <span class="stats-label">Vigentes</span></div>
+            <div><span id="garantias-externos">-</span> <span class="stats-label">Garantía</span></div>
+            <div><span id="vencidos-externos">-</span> <span class="stats-label">Atrasados</span></div>
+          </div>
+        </div>
+        <div class="dashboard-card" id="card-dota">
+          <h3>
+            Dota
+            <span class="badge" id="badge-dota">-</span>
+          </h3>
+          <div class="stats">
+            <div><span id="vigentes-dota">-</span> <span class="stats-label">Vigentes</span></div>
+            <div><span id="garantias-dota">-</span> <span class="stats-label">Garantía</span></div>
+            <div><span id="vencidos-dota">-</span> <span class="stats-label">Atrasados</span></div>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-icon"><i class="fas fa-tools"></i></div>
-        <div class="card-info">
-          <h3>Reparaciones Activas</h3>
-          <p>37 en proceso</p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-icon"><i class="fas fa-check-circle"></i></div>
-        <div class="card-info">
-          <h3>Entregadas</h3>
-          <p>204 completadas</p>
+      <!-- Segunda fila: Totales con counter animado -->
+      <div class="dashboard-row dashboard-row-center">
+        <div class="dashboard-card dashboard-card-large" id="card-totales">
+          <h3>Totales</h3>
+          <div class="stats stats-large">
+            <div>
+              <span class="counter" id="total-vigentes" data-value="0">0</span>
+              <span class="stats-label">Vigentes</span>
+            </div>
+            <div>
+              <span class="counter" id="total-garantias" data-value="0">0</span>
+              <span class="stats-label">Garantía</span>
+            </div>
+            <div>
+              <span class="counter" id="total-vencidos" data-value="0">0</span>
+              <span class="stats-label">Atrasados</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </main>
+
+
 
   <!-- SCRIPTS -->
   <script src="/scripts/main.js"></script>
@@ -102,6 +114,7 @@
   <script src="/scripts/abm_clientes.js"></script>
   <script src="/scripts/dashboard.js"></script>
   <script src="/scripts/main.js"></script>
+  <script src="/scripts/index.js"></script>
 
 
 

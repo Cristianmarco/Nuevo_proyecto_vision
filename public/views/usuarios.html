@@ -84,17 +84,24 @@
         <h2>Agregar Usuario</h2>
         <form id="form-agregar-usuario">
           <input type="email" name="email" placeholder="Email" required />
-          <input type="password" name="password" placeholder="Contraseña" required />
+          <div class="password-container" style="position:relative;">
+            <input type="password" name="password" id="password-agregar" placeholder="Contraseña" required />
+            <span class="toggle-password" onclick="togglePassword('password-agregar', this)"
+              style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">
+              <i class="fa fa-eye"></i>
+            </span>
+          </div>
           <select name="rol" id="rol-agregar" required onchange="toggleClienteSelect(this.value)">
             <option value="admin">Admin</option>
             <option value="cliente">Cliente</option>
           </select>
-          <!-- Contenedor para el select de cliente, lo completa el JS -->
           <div id="select-cliente-agregar" style="display:none; margin-top:10px"></div>
           <button type="submit" class="btn-guardar">Guardar</button>
         </form>
       </div>
     </div>
+
+
 
 
     <!-- MODAL MODIFICAR USUARIO -->
@@ -104,12 +111,17 @@
         <h2>Modificar Usuario</h2>
         <form id="form-modificar-usuario">
           <input type="email" name="email" placeholder="Email" readonly />
-          <input type="password" name="password" placeholder="Nueva Contraseña" />
+          <div class="password-container" style="position:relative;">
+            <input type="password" name="password" id="password-modificar" placeholder="Nueva Contraseña" />
+            <span class="toggle-password" onclick="togglePassword('password-modificar', this)"
+              style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">
+              <i class="fa fa-eye"></i>
+            </span>
+          </div>
           <select name="rol" id="rol-modificar" required onchange="toggleClienteSelectEdit(this.value)">
             <option value="admin">Admin</option>
             <option value="cliente">Cliente</option>
           </select>
-          <!-- Contenedor para el select de cliente, lo completa el JS -->
           <div id="select-cliente-modificar" style="display:none; margin-top:10px"></div>
           <button type="submit" class="btn-guardar">Guardar Cambios</button>
         </form>

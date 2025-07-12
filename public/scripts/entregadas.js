@@ -1,234 +1,269 @@
 let entregadas = [];
+let mapaClientes = {}; // código -> nombre
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const rol = localStorage.getItem('rol');
   if (rol && rol.toLowerCase() === 'cliente' && !window.location.pathname.includes('reparaciones-vigentes')) {
     window.location.href = '/reparaciones-vigentes';
+    return;
   }
+
+  await cargarMapaClientes();
+  await cargarEntregadas();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    cargarEntregadas();
-});
+// Cargar clientes para mostrar nombres en vez de códigos
+async function cargarMapaClientes() {
+  try {
+    const res = await fetch('/api/clientes');
+    const clientes = await res.json();
+    mapaClientes = {};
+    if (clientes && Array.isArray(clientes)) {
+      clientes.forEach(c => {
+        mapaClientes[c.codigo] = c.fantasia || c.razon_social || c.codigo;
+      });
+    }
+  } catch (err) {
+    console.error('No se pudo cargar clientes:', err);
+    mapaClientes = {};
+  }
+}
 
 async function cargarEntregadas() {
-    try {
-        const response = await fetch('/api/entregadas');
-        entregadas = await response.json();
-        renderizarEntregadas(entregadas);
-    } catch (error) {
-        console.error("Error al cargar entregadas:", error);
-    }
+  try {
+    const response = await fetch('/api/entregadas');
+    entregadas = await response.json();
+    renderizarEntregadas(entregadas);
+  } catch (error) {
+    console.error("Error al cargar entregadas:", error);
+  }
 }
 
 function renderizarEntregadas(entregadas) {
-    const tbody = document.getElementById("entregadas-tbody");
-    if (!tbody) return;
+  const tbody = document.getElementById("entregadas-tbody");
+  if (!tbody) return;
 
-    tbody.innerHTML = "";
+  tbody.innerHTML = "";
 
-    // Ordenar por id (numérico, de menor a mayor)
-    entregadas.sort((a, b) => {
-        const idA = parseInt(String(a.id).match(/\d+/));
-        const idB = parseInt(String(b.id).match(/\d+/));
-        return idA - idB;
+  // Ordenar por id (numérico, de menor a mayor)
+  entregadas.sort((a, b) => {
+    const idA = parseInt(String(a.id).match(/\d+/));
+    const idB = parseInt(String(b.id).match(/\d+/));
+    return idA - idB;
+  });
+
+  entregadas.forEach(rep => {
+    // Formatear la fecha de entrega a dd/mm/yyyy
+    let fechaEntrega = "-";
+    if (rep.fecha_entrega) {
+      fechaEntrega = formatearFecha(rep.fecha_entrega);
+    }
+
+    const nombreCliente = mapaClientes[rep.cliente_codigo] || rep.cliente_codigo || "";
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td data-label="ID">${rep.id}</td>
+      <td data-label="Código">${rep.codigo}</td>
+      <td data-label="Tipo">${rep.tipo}</td>
+      <td data-label="Modelo">${rep.modelo}</td>
+      <td data-label="Cliente">${nombreCliente}</td>
+      <td data-label="Fecha de Entrega">${fechaEntrega}</td>
+    `;
+    row.addEventListener("click", function () {
+      tbody.querySelectorAll("tr").forEach(f => f.classList.remove("selected"));
+      this.classList.add("selected");
     });
 
-    entregadas.forEach(rep => {
-        // Formatear la fecha de entrega a dd/mm/yyyy
-        let fechaEntrega = "-";
-        if (rep.fechaEntrega) {
-            const fecha = new Date(rep.fechaEntrega);
-            const dia = String(fecha.getDate()).padStart(2, '0');
-            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-            const anio = fecha.getFullYear();
-            fechaEntrega = `${dia}/${mes}/${anio}`;
-        }
+    // Doble click: ver historial
+    row.addEventListener("dblclick", () => visualizarHistorial(rep.id));
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td data-label="ID">${rep.id}</td>
-            <td data-label="Código">${rep.codigo}</td>
-            <td data-label="Tipo">${rep.tipo}</td>
-            <td data-label="Modelo">${rep.modelo}</td>
-            <td data-label="Cliente">${rep.cliente}</td>
-            <td data-label="Fecha de Entrega">${fechaEntrega}</td>
-        `;
-        row.addEventListener("click", function () {
-            tbody.querySelectorAll("tr").forEach(f => f.classList.remove("selected"));
-            this.classList.add("selected");
-        });
-        
-        tbody.appendChild(row);
-    });
+    tbody.appendChild(row);
+  });
 }
 
-// Búsqueda global: SIEMPRE usa el renderizado principal
+// Muestra el historial usando la API SQL
+async function visualizarHistorial(reparacionId) {
+  try {
+    const res = await fetch(`/api/historial/${reparacionId}`);
+    const historial = await res.json();
+
+    document.getElementById("historial-titulo").textContent = `ID: ${reparacionId}`;
+    // podés también mostrar más datos si querés
+
+    const contenedor = document.getElementById("campo-historial");
+    if (!Array.isArray(historial) || historial.length === 0) {
+      contenedor.innerHTML = "<em>No hay historial para esta reparación.</em>";
+      return;
+    }
+    contenedor.innerHTML = historial.map(evento => `
+      <div class="historial-registro">
+        <table>
+          <tr>
+            <td><strong>Fecha:</strong> ${formatearFecha(evento.fecha)}</td>
+            <td><strong>Técnico:</strong> ${evento.tecnico}</td>
+            <td><strong>Garantía:</strong> ${evento.garantia ? 'Sí' : 'No'}</td>
+          </tr>
+          <tr>
+            <td colspan="3"><strong>Observaciones:</strong> ${evento.observaciones}</td>
+          </tr>
+          <tr>
+            <td colspan="3"><strong>Repuestos:</strong> ${evento.repuestos}</td>
+          </tr>
+        </table>
+      </div>
+    `).join('');
+    document.getElementById("modal-historial").style.display = "flex";
+  } catch (error) {
+    alert("No se pudo cargar el historial.");
+    console.error(error);
+  }
+}
+
+// Buscador global
 async function buscarGlobal() {
-    const consulta = document.getElementById("busqueda-global").value.toLowerCase();
+  const consulta = document.getElementById("busqueda-global").value.toLowerCase();
+  const resEntregadas = await fetch('/api/entregadas');
+  const entregadas = await resEntregadas.json();
 
-    const resEntregadas = await fetch('/api/entregadas');
-    const entregadas = await resEntregadas.json();
+  const resultadosEntregadas = entregadas.filter(rep =>
+    Object.values(rep).some(val => String(val).toLowerCase().includes(consulta))
+  );
 
-    const resultadosEntregadas = entregadas.filter(rep =>
-        Object.values(rep).some(val => String(val).toLowerCase().includes(consulta))
-    );
-
-    renderizarEntregadas(resultadosEntregadas);
+  renderizarEntregadas(resultadosEntregadas);
+  mostrarNotificacion(resultadosEntregadas.length);
 }
 
-// Notificación de búsqueda
+// Notificación de búsqueda (sin cambios)
 function mostrarNotificacion(resultados) {
-    let notificacion = document.getElementById('notificacion-busqueda');
-
-    if (!notificacion) {
-        notificacion = document.createElement('div');
-        notificacion.id = 'notificacion-busqueda';
-        notificacion.style.position = 'fixed';
-        notificacion.style.top = '80px';
-        notificacion.style.right = '30px';
-        notificacion.style.backgroundColor = '#4da6ff';
-        notificacion.style.color = '#fff';
-        notificacion.style.padding = '10px 20px';
-        notificacion.style.borderRadius = '8px';
-        notificacion.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-        notificacion.style.zIndex = '1000';
-        document.body.appendChild(notificacion);
-    }
-
-    if (resultados === 0) {
-        notificacion.textContent = "🔍 No se encontraron resultados.";
-        notificacion.style.backgroundColor = '#d9534f';
-    } else {
-        notificacion.textContent = `✅ ${resultados} resultado(s) encontrado(s).`;
-        notificacion.style.backgroundColor = '#5cb85c';
-    }
-
-    notificacion.style.display = 'block';
-
-    // Ocultar la notificación después de 2.5 segundos
-    setTimeout(() => {
-        notificacion.style.display = 'none';
-    }, 2500);
+  let notificacion = document.getElementById('notificacion-busqueda');
+  if (!notificacion) {
+    notificacion = document.createElement('div');
+    notificacion.id = 'notificacion-busqueda';
+    notificacion.style.position = 'fixed';
+    notificacion.style.top = '80px';
+    notificacion.style.right = '30px';
+    notificacion.style.backgroundColor = '#4da6ff';
+    notificacion.style.color = '#fff';
+    notificacion.style.padding = '10px 20px';
+    notificacion.style.borderRadius = '8px';
+    notificacion.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    notificacion.style.zIndex = '1000';
+    document.body.appendChild(notificacion);
+  }
+  if (resultados === 0) {
+    notificacion.textContent = "🔍 No se encontraron resultados.";
+    notificacion.style.backgroundColor = '#d9534f';
+  } else {
+    notificacion.textContent = `✅ ${resultados} resultado(s) encontrado(s).`;
+    notificacion.style.backgroundColor = '#5cb85c';
+  }
+  notificacion.style.display = 'block';
+  setTimeout(() => {
+    notificacion.style.display = 'none';
+  }, 2500);
 }
 
 function formatearFecha(fechaISO) {
-    if (!fechaISO) return "-";
-    const fecha = new Date(fechaISO);
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-    const anio = fecha.getFullYear();
-    return `${dia}/${mes}/${anio}`;
+  if (!fechaISO) return "-";
+  // Admite tanto "YYYY-MM-DD" como "2025-06-22T03:00:00.000Z"
+  const fecha = new Date(fechaISO);
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const anio = fecha.getFullYear();
+  return `${dia}/${mes}/${anio}`;
 }
-
 
 // Historial y modales
 
 let historialActual = '';
 let codigoActual = '';
 
-function visualizarHistorial(codigo) {
-    const rep = entregadas.find(r => r.codigo === codigo);
-    if (!rep) {
-        console.error("No se encontró la reparación con el código:", codigo);
-        alert("No se pudo encontrar la reparación.");
-        return;
-    }
+async function visualizarHistorial(codigo) {
+  const rep = entregadas.find(r => String(r.id) === String(codigo));
+  if (!rep) return alert("No se encontró la reparación.");
 
+  document.getElementById("historial-titulo").textContent = `ID: ${rep.id}`;
+  document.getElementById("datos-equipo").innerHTML = `
+    <p><strong>Código:</strong> ${rep.codigo}</p>
+    <p><strong>Tipo:</strong> ${rep.tipo}</p>
+    <p><strong>Modelo:</strong> ${rep.modelo}</p>
+    <p><strong>Cliente:</strong> ${rep.cliente}</p>
+  `;
 
+  // 🔴 Consulta historial de esa reparación entregada
+  let historialData = [];
+  try {
+    const resp = await fetch(`/api/historial/${rep.id}`);
+    historialData = await resp.json();
+  } catch (e) { historialData = []; }
 
-    // Asigna el título y datos principales
-    document.getElementById("historial-titulo").textContent = `ID: ${rep.id}`;
-    document.getElementById("datos-equipo").innerHTML = `
-        <p><strong>Código:</strong> ${rep.codigo}</p>
-        <p><strong>Tipo:</strong> ${rep.tipo}</p>
-        <p><strong>Modelo:</strong> ${rep.modelo}</p>
-        <p><strong>Cliente:</strong> ${rep.cliente}</p>
-    `;
-
-    // Prepara historial (asegurate de tener array)
-    const historialData = Array.isArray(rep.historial) ? rep.historial : [];
-
-    const contenedor = document.getElementById("campo-historial");
+  const contenedor = document.getElementById("campo-historial");
+  if (!historialData.length) {
+    contenedor.innerHTML = '<em>No hay historial para este equipo.</em>';
+  } else {
     contenedor.innerHTML = historialData.map(evento => `
-        <div class="historial-registro">
-            <table>
-                <tr>
-                    <td><strong>Fecha:</strong> ${formatearFecha(evento.fecha)}</td>
-                    <td><strong>Técnico:</strong> ${evento.tecnico}</td>
-                    <td><strong>Garantía:</strong> ${evento.garantia ? 'Sí' : 'No'}</td>
-                </tr>
-                <tr>
-                    <td colspan="3"><strong>Observaciones:</strong> ${evento.observaciones}</td>
-                </tr>
-                <tr>
-                    <td colspan="3"><strong>Repuestos:</strong> ${evento.repuestos}</td>
-                </tr>
-            </table>
-        </div>
+      <div class="historial-registro">
+        <table>
+          <tr>
+            <td><strong>Fecha:</strong> ${formatearFecha(evento.fecha)}</td>
+            <td><strong>Técnico:</strong> ${evento.tecnico || ''}</td>
+            <td><strong>Garantía:</strong> ${evento.garantia ? 'Sí' : 'No'}</td>
+          </tr>
+          <tr>
+            <td colspan="3"><strong>Observaciones:</strong> ${evento.observaciones}</td>
+          </tr>
+          <tr>
+            <td colspan="3"><strong>Repuestos:</strong> ${evento.repuestos}</td>
+          </tr>
+        </table>
+      </div>
     `).join('');
-
-    document.getElementById("modal-historial").style.display = "flex";
+  }
+  document.getElementById("modal-historial").style.display = "flex";
 }
+
 
 function visualizarHistorialEntregada() {
-    // Verificar que haya una fila seleccionada
-    const fila = document.querySelector("#entregadas-tbody tr.selected");
-    if (!fila) {
-        alert("Por favor, selecciona un equipo primero.");
-        return;
-    }
+  // Verificar que haya una fila seleccionada
+  const fila = document.querySelector("#entregadas-tbody tr.selected");
+  if (!fila) {
+    alert("Por favor, selecciona un equipo primero.");
+    return;
+  }
 
-    const codigo = fila.children[1].textContent.trim();
-    visualizarHistorial(codigo);
+  const id = fila.children[0].textContent.trim(); // <-- Columna 0 es ID (NO código)
+  visualizarHistorial(id); // Pasa el id, no el código
 }
-
 
 
 function cerrarModalHistorial() {
-    document.getElementById("modal-historial").style.display = "none";
+  document.getElementById("modal-historial").style.display = "none";
 }
 
 function abrirModalAgregarHistorial() {
-    const index = obtenerIndiceSeleccionado();
-    console.log("Índice seleccionado:", index, "codigoActual:", codigoActual);
-    if (index === -1) {
-        alert("Selecciona una reparación primero.");
-        return;
-    }
-    const rep = reparaciones[index];
-    codigoActual = rep.codigo;
-    document.getElementById("modal-agregar-historial").style.display = "flex";
+  const index = obtenerIndiceSeleccionado();
+  console.log("Índice seleccionado:", index, "codigoActual:", codigoActual);
+  if (index === -1) {
+    alert("Selecciona una reparación primero.");
+    return;
+  }
+  const rep = reparaciones[index];
+  codigoActual = rep.codigo;
+  document.getElementById("modal-agregar-historial").style.display = "flex";
 }
 
 function cerrarModalAgregarHistorial() {
-    document.getElementById("modal-agregar-historial").style.display = "none";
-}
-
-function guardarHistorial() {
-    const nuevoRegistro = document.getElementById("nuevo-historial").value;
-    if (!nuevoRegistro.trim()) return alert("Debes ingresar una descripción.");
-
-    historialActual += `\n[${new Date().toLocaleDateString()}] ${nuevoRegistro}`;
-
-    const dataset = (typeof entregadas !== "undefined" ? entregadas : []);
-    const idx = dataset.findIndex(r => r.codigo === codigoActual);
-    if (idx !== -1) {
-        dataset[idx].historial = historialActual;
-    }
-
-    // Recargar visualización
-    document.getElementById("historial-texto").value = historialActual;
-    cerrarModalAgregarHistorial();
+  document.getElementById("modal-agregar-historial").style.display = "none";
 }
 
 // Deseleccionar fila al hacer click fuera de la tabla
 document.addEventListener("click", function (e) {
-    const tabla = document.getElementById("entregadas-tbody");
-    if (!tabla) return;
-    if (!tabla.contains(e.target)) {
-        tabla.querySelectorAll("tr.selected").forEach(tr => tr.classList.remove("selected"));
-    }
+  const tabla = document.getElementById("entregadas-tbody");
+  if (!tabla) return;
+  if (!tabla.contains(e.target)) {
+    tabla.querySelectorAll("tr.selected").forEach(tr => tr.classList.remove("selected"));
+  }
 });
 
 async function recargarEquipoEntregado() {
@@ -238,26 +273,35 @@ async function recargarEquipoEntregado() {
     return;
   }
 
-  const codigo = fila.children[1].textContent.trim();
+  const id_equipo = fila.children[0].textContent.trim();
 
-  // Traemos la reparación seleccionada
-  const rep = entregadas.find(r => r.codigo === codigo);
+  // Busca el registro por id
+  const rep = entregadas.find(r => String(r.id) === String(id_equipo));
   if (!rep) {
     alert("No se encontró la reparación seleccionada.");
     return;
   }
 
-  // Actualizar la fecha de ingreso al día de hoy (formato yyyy-mm-dd)
-  const hoy = new Date();
-  rep.fechaIngreso = hoy.toISOString().split("T")[0];
-  rep.estado = "Ingreso";
+  // Mapeá los campos correctamente
+  const nuevaReparacion = {
+    id: rep.id,
+    codigo: rep.codigo,
+    tipo: rep.tipo,
+    modelo: rep.modelo,
+    cliente_codigo: rep.cliente_codigo,
+    estado: 'Ingreso', // o como quieras setearlo
+    fecha_ingreso: new Date().toISOString().split("T")[0], // hoy
+    fecha_entrega: null,
+    garantia: rep.garantia || false,
+    descripcion: rep.descripcion || ''
+  };
 
   try {
-    // Guardar en reparaciones vigentes
+    // POST con los campos correctos
     const response = await fetch('/api/reparaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(rep)
+      body: JSON.stringify(nuevaReparacion)
     });
 
     if (!response.ok) {
@@ -266,8 +310,11 @@ async function recargarEquipoEntregado() {
       return;
     }
 
-    // Eliminar de entregadas
-    const delResponse = await fetch(`/api/entregadas/${codigo}`, {
+    console.log("DEBUG - objeto que se envía:", nuevaReparacion);
+
+
+    // Eliminar de entregadas POR ID
+    const delResponse = await fetch(`/api/entregadas/${id_equipo}`, {
       method: 'DELETE'
     });
 
@@ -285,4 +332,5 @@ async function recargarEquipoEntregado() {
     alert("Error al recargar equipo.");
   }
 }
+
 
