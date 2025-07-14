@@ -119,5 +119,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
+async function cargarResumenDota() {
+  try {
+    const resp = await fetch('/api/estadisticas');
+    const stats = await resp.json();
+    document.getElementById('vigentes-dota').textContent = stats.dota?.vigentes ?? '-';
+    document.getElementById('garantias-dota').textContent = stats.dota?.garantias ?? '-';
+    // Si querés, lo mismo para badge:
+    document.getElementById('badge-dota').textContent = stats.dota?.vigentes ?? '-';
+  } catch (e) {
+    document.getElementById('vigentes-dota').textContent = '-';
+    document.getElementById('garantias-dota').textContent = '-';
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', cargarResumenDota);
+
 
 

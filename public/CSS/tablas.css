@@ -693,3 +693,27 @@ body.usuarios-page {
     min-width: 0;
   }
 }
+
+.tabla-garantias th {
+  border-bottom: 2px solid #176ae5 !important;
+  background: #e8f2ff;
+  color: #175ea9;
+}
+.tabla-garantias {
+  border: 1.5px solid #1572d2;
+  border-radius: 9px;
+}
+
+.tabla-garantias tr:last-child td {
+  border-bottom: none;
+}
+@media (max-width: 900px) {
+  .tabla-garantias, .tabla-garantias thead, .tabla-garantias tbody, .tabla-garantias tr, .tabla-garantias td, .tabla-garantias th {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .tabla-garantias tr { margin-bottom: 12px; }
+  .tabla-garantias th { background: #e8f2ff; font-size: 1rem; }
+  .tabla-garantias td { border: none; padding: 7px 10px; }
+}
