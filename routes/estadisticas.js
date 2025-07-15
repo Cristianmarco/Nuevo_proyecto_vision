@@ -40,8 +40,7 @@ router.get('/', async (req, res, next) => {
     );
 
 
-    console.log('Pendientes Dota:', vigentesDota.rows[0].count);
-
+    
     res.json({
       externos: {
         vigentes: Number(vigentesExt.rows[0].count),
